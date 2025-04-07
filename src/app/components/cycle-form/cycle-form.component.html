@@ -1,0 +1,87 @@
+<form [formGroup]="cycleForm" (ngSubmit)="onSubmit()">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{ cycleId ? 'Edit Cycle' : 'Add New Cycle' }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Model Name</label>
+              <input type="text" class="form-control" formControlName="modelName">
+              <div *ngIf="cycleForm.get('modelName')?.invalid && cycleForm.get('modelName')?.touched" 
+                   class="invalid-feedback d-block">
+                Model name is required
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label">Brand</label>
+              <select class="form-select" formControlName="brandId">
+                <option *ngFor="let brand of brands" [value]="brand.brandId">
+                  {{ brand.brandName }}
+                </option>
+              </select>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label">Type</label>
+              <select class="form-select" formControlName="typeId">
+                <option *ngFor="let type of types" [value]="type.typeId">
+                  {{ type.typeName }}
+                </option>
+              </select>
+            </div>
+          </div>
+  
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Price</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" formControlName="price" step="0.01">
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label">Stock Quantity</label>
+              <input type="number" class="form-control" formControlName="stockQuantity">
+            </div>
+  
+            <!-- <div class="mb-3">
+              <label class="form-label">Image URL</label>
+              <input type="text" class="form-control" formControlName="imageUrl">
+              <small class="text-muted">Paste a direct image link</small>
+            </div>
+          </div>
+        </div> -->
+        <!-- Replace the imageUrl input with the upload component -->
+            <div class="mb-3">
+              <label class="form-label">Cycle Image</label>
+              <app-image-upload (imageSelected)="onImageSelected($event)"></app-image-upload>
+              <small class="text-muted">Upload a high-quality image of the cycle</small>
+            </div>
+            </div>
+            </div>
+
+  
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" formControlName="description" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/cycles">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="cycleForm.invalid || isSubmitting">
+          <span *ngIf="!isSubmitting">Save</span>
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </form>
+  
+  <div *ngIf="previewImage" class="mt-3 text-center">
+    <img [src]="previewImage" class="img-thumbnail" style="max-height: 200px;">
+  </div>

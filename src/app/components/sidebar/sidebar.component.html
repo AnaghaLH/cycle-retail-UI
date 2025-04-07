@@ -1,0 +1,60 @@
+<div class="sidebar bg-light border-end" [class.collapsed]="collapsed">
+    <div class="sidebar-header p-3 border-bottom">
+      <h5 class="mb-0 text-center" *ngIf="!collapsed">Menu</h5>
+      <button class="btn btn-sm btn-outline-secondary toggle-btn" (click)="toggleCollapse()">
+        <i class="fa" [class.fa-chevron-left]="!collapsed" [class.fa-chevron-right]="collapsed"></i>
+      </button>
+    </div>
+    
+    <ul class="nav flex-column">
+      <!-- Common for all roles -->
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="fa fa-home me-2"></i>
+          <span *ngIf="!collapsed">Dashboard</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/cycles" routerLinkActive="active">
+          <i class="fa fa-bicycle me-2"></i>
+          <span *ngIf="!collapsed">Inventory</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/orders" routerLinkActive="active">
+          <i class="fa fa-shopping-cart me-2"></i>
+          <span *ngIf="!collapsed">Orders</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/customers" routerLinkActive="active">
+          <i class="fa fa-users me-2"></i>
+          <span *ngIf="!collapsed">Customers</span>
+        </a>
+      </li>
+      
+      <!-- Admin Only Section -->
+      <ng-container *ngIf="authService.isAdmin()">
+        <li class="nav-item mt-2 border-top pt-2" *ngIf="!collapsed">
+          <small class="text-muted ps-3">Admin</small>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/users" routerLinkActive="active">
+            <i class="fa fa-user-cog me-2"></i>
+            <span *ngIf="!collapsed">User Management</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/reports" routerLinkActive="active">
+            <i class="fa fa-chart-bar me-2"></i>
+            <span *ngIf="!collapsed">Reports</span>
+          </a>
+        </li>
+      </ng-container>
+    </ul>
+  </div>

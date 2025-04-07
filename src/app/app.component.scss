@@ -1,0 +1,13 @@
+.main-content {
+    padding: 20px;
+    margin-top: 56px; // navbar height
+    
+    &.with-sidebar {
+      margin-left: 250px;
+      transition: margin-left 0.3s ease;
+      
+      &.sidebar-collapsed {
+        margin-left: 60px;
+      }
+    }
+  }

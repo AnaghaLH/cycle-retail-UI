@@ -1,0 +1,23 @@
+<div class="container mt-4">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Welcome to Cycle Retail Shop</h5>
+            <button class="btn btn-danger btn-sm" (click)="authService.logout()">
+              <i class="fa fa-sign-out"></i> Logout
+            </button>
+          </div>
+          <div class="card-body">
+            <p *ngIf="authService.isAdmin()" class="text-success">
+              You are logged in as an <strong>Administrator</strong>
+            </p>
+            <p *ngIf="authService.isEmployee()" class="text-primary">
+              You are logged in as an <strong>Employee</strong>
+            </p>
+            <p>Use the navigation menu to access different features.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
