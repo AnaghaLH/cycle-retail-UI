@@ -10,6 +10,8 @@ import { CustomersComponent } from './components/customers/customers.component';
 import { UsersComponent } from './components/users/users.component';
 import { AdminGuard } from './guards/admin.guard';
 import { CycleFormComponent } from './components/cycle-form/cycle-form.component';
+import { OrderFormComponent } from './components/order-form/order-form.component';
+import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,8 +27,11 @@ const routes: Routes = [
       {path: 'cycles', component: CyclesComponent, canActivate: [AuthGuard]},
       {path: 'cycles/new', component: CycleFormComponent, canActivate: [AuthGuard, AdminGuard]},
       {path: 'cycles/:id', component: CycleFormComponent, canActivate: [AuthGuard]},
-      {path: 'cycles/:id/edit', component: CycleFormComponent, canActivate: [AuthGuard, AdminGuard]}
-    ]
+      {path: 'cycles/:id/edit', component: CycleFormComponent, canActivate: [AuthGuard, AdminGuard]},
+      {path:'orders', component: OrdersComponent, canActivate:[AuthGuard]},
+      {path:'orders/new', component: OrderFormComponent, canActivate:[AuthGuard]},
+      {path:'orders/:id', component: OrderDetailComponent, canActivate:[AuthGuard]},
+            ]
   },
   { path: '**', redirectTo: '' }
 ];

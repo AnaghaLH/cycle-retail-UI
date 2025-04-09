@@ -1,0 +1,93 @@
+<div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Order #{{ order.orderId }}</h5>
+          <div>
+            <span class="badge" [ngClass]="{
+              'bg-warning': order.status === 'Pending',
+              'bg-info': order.status === 'Processing',
+              'bg-primary': order.status === 'Shipped',
+              'bg-success': order.status === 'Delivered',
+              'bg-danger': order.status === 'Cancelled'
+            }">{{ order.status }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6>Customer Information</h6>
+              <p>
+                <strong>{{ order.customer?.firstName }} {{ order.customer?.lastName }}</strong><br>
+                {{ order.customer?.email }}<br>
+                {{ order.customer?.phone }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6>Order Details</h6>
+              <p>
+                <strong>Date:</strong> {{ order.orderDate | date:'medium' }}<br>
+                <strong>Employee:</strong> {{ order.employee?.username }}<br>
+                <strong>Total:</strong> {{ order.totalAmount | currency }}
+              </p>
+            </div>
+          </div>
+  
+          <h6 class="mt-4">Order Items</h6>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Cycle</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Qty</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of order.orderItems">
+                  <td>
+                    <a [routerLink]="['/cycles', item.cycleId]">
+                      {{ item.cycle?.modelName }} ({{ item.cycle?.brandName }})
+                    </a>
+                  </td>
+                  <td class="text-end">{{ item.unitPrice | currency }}</td>
+                  <td class="text-end">{{ item.quantity }}</td>
+                  <td class="text-end">{{ item.quantity * item.unitPrice | currency }}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                  <td class="text-end">{{ order.totalAmount | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn btn-outline-secondary me-2" (click)="printOrder()">
+            <i class="fa fa-print me-1"></i> Print
+          </button>
+          <button class="btn btn-primary" (click)="updateStatus()" *ngIf="canUpdateStatus()">
+            Update Status
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">Status History</h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" *ngFor="let status of statusHistory">
+              <div class="d-flex justify-content-between">
+                <span>{{ status.status }}</span>
+                <small class="text-muted">{{ status.date | date:'short' }}</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>

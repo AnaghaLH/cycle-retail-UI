@@ -55,8 +55,8 @@
                 </a>
                 <span *ngIf="cycle.stockQuantity <= 5" class="badge bg-warning ms-2">Low Stock</span>
               </td>
-              <td>{{ cycle.brand?.brandName }}</td>
-              <td>{{ cycle.type?.typeName }}</td>
+              <td>{{ cycle.brand.brandName }}</td>
+              <td>{{ cycle.type.typeName }}</td>
               <td class="text-end">{{ cycle.price | currency }}</td>
               <td class="text-end">
                 <span [ngClass]="{

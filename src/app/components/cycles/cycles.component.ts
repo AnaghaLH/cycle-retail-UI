@@ -117,8 +117,11 @@ totalItems=0;
     this.isLoading = true;
     this.cycleService.getCycles().subscribe({
       next: (response) => {
-        this.cycles = response.$values; // full dataset
-        this.applyFilters(); // apply search, brand, type filters
+
+        console.log('👉 response:', response);
+       
+        this.cycles = Array.isArray(response) ? response : response?.$values;; 
+        this.applyFilters(); 
         this.isLoading = false;
       },
       error: () => {
@@ -152,13 +155,15 @@ totalItems=0;
     });
   
     this.totalItems = this.filteredCycles.length;
+    // console.log('Filtered Cycles' + this.filteredCycles);
+    
     this.currentPage = 1;
   }
   
   
   onPageChange(page: number): void {
     this.currentPage = page;
-    //this.loadCycles();
+   // this.loadCycles();
   }
 
   deleteCycle(id: number): void {
@@ -166,6 +171,7 @@ totalItems=0;
 
     this.cycleService.deleteCycle(id).subscribe({
       next: () => {
+        
         this.toastr.success('Cycle deleted successfully');
         this.loadCycles();
       },

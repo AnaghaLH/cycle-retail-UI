@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Cycle } from '../models/cycle.model';
 // import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { CycleDto } from '../models/cycle.dto';
+import { CycleResponseDto } from '../models/cycle.dto';
 @Injectable({
   providedIn: 'root'
 })
@@ -57,11 +57,11 @@ export class CycleService {
     return this.http.get<Cycle>(`${this.apiUrl}/${id}`, {headers: this.getAuthHeaders()});
   }
 
-  createCycle(cycle: CycleDto): Observable<Cycle> {
+  createCycle(cycle: CycleResponseDto): Observable<Cycle> {
     return this.http.post<Cycle>(this.apiUrl, cycle, {headers: this.getAuthHeaders()});
   }
 
-  updateCycle(id: number, cycle: CycleDto): Observable<any> {
+  updateCycle(id: number, cycle: CycleResponseDto): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, cycle, {headers: this.getAuthHeaders()});
   }
 

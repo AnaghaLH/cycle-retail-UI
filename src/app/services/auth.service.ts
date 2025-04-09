@@ -42,6 +42,7 @@ export class AuthService {
         const decodedToken = this.jwtHelper.decodeToken(token);
         
         const user = {
+          userId:decodedToken.nameid,
           username: decodedToken.unique_name,
           role: decodedToken.role,
           token: token

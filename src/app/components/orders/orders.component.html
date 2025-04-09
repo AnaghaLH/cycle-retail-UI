@@ -1,1 +1,94 @@
-<p>orders works!</p>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Orders Management</h5>
+      <div>
+        <button class="btn btn-primary btn-sm" routerLink="/orders/new">
+          <i class="fa fa-plus me-1"></i> Create New Order
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <select class="form-select form-select-sm" [(ngModel)]="statusFilter" (change)="loadOrders()">
+            <option value="">All Statuses</option>
+            <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchQuery" 
+                   (keyup.enter)="loadOrders()">
+            <button class="btn btn-outline-secondary" type="button" (click)="loadOrders()">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th class="text-end">Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>{{ order.orderId }}</td>
+              <td>
+                <a [routerLink]="['/customers', order.customerId]">
+                  {{ order.customer?.firstName }} {{ order.customer?.lastName }}
+                </a>
+              </td>
+              <td>{{ order.orderDate | date:'mediumDate' }}</td>
+              <td class="text-end">{{ order.totalAmount | currency }}</td>
+              <td>
+                <select class="form-select form-select-sm" [(ngModel)]="order.status" 
+                        (change)="updateStatus(order.orderId, order.status)"
+                        [disabled]="order.status === 'Cancelled' || order.status === 'Delivered'">
+                  <option *ngFor="let status of orderStatuses" [value]="status" 
+                          [disabled]="!isStatusAvailable(order.status, status)">
+                    {{ status }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <a [routerLink]="['/orders', order.orderId]" class="btn btn-outline-primary">
+                    <i class="fa fa-eye"></i>
+                  </a>
+                  <button (click)="deleteOrder(order.orderId)" class="btn btn-outline-danger" 
+                          [disabled]="!authService.isAdmin()">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>Showing {{ orders.length }} orders</div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
+            </li>
+            <li *ngFor="let page of getPageNumbers()" class="page-item" [class.active]="page === currentPage">
+              <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>

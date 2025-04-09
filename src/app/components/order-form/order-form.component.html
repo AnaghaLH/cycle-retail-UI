@@ -1,0 +1,136 @@
+<form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Create New Order</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Customer</label>
+              <select class="form-select" formControlName="customerId" (change)="loadCustomerOrders()">
+                <option *ngFor="let customer of customers" [value]="customer.customerId">
+                  {{ customer.firstName }} {{ customer.lastName }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <!-- <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Employee</label>
+              <input class="form-control" [value]="currentUser?.username" readonly>
+            </div>
+          </div> -->
+        </div>
+  
+        <div class="mb-4">
+          <h6 class="mb-3">Order Items</h6>
+          
+          <div class="table-responsive mb-3">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Cycle</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody formArrayName="items">
+                <tr *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i">
+                  <td>
+                    <select class="form-select form-select-sm" formControlName="cycleId" 
+                            (change)="onCycleChange(i)">
+                      <option value="">Select Cycle</option>
+                      <option *ngFor="let cycle of availableCycles" [value]="cycle.cycleId" 
+                              [disabled]="isCycleInOrder(cycle.cycleId, i)">
+                        {{ cycle.modelName }} ({{ cycle.brand.brandName}})
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" formControlName="unitPrice" readonly>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" formControlName="quantity" min="1" 
+                           (change)="calculateTotal()">
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" 
+                           [value]="item.value.quantity * item.value.unitPrice" readonly>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeItem(i)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Order Total:</strong></td>
+                  <td><strong>{{ orderTotal | currency }}</strong></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+  
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addItem()">
+            <i class="fa fa-plus me-1"></i> Add Item
+          </button>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/orders">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="orderForm.invalid || isSubmitting">
+          <span *ngIf="!isSubmitting">Create Order</span>
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </form>
+  
+  <!-- Customer Order History -->
+  <div class="card mt-4" *ngIf="customerOrders.length > 0">
+    <div class="card-header">
+      <h6 class="mb-0">Customer's Previous Orders</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of customerOrders">
+              <td>{{ order.orderId }}</td>
+              <td>{{ order.orderDate | date:'shortDate' }}</td>
+              <!-- <td>{{ order.orderItems.length ||0}}</td> -->
+              <td>{{ (order.orderItems || []).length }}</td>
+
+              <td>{{ order.totalAmount | currency }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning': order.status === 'Pending',
+                  'bg-info': order.status === 'Processing',
+                  'bg-primary': order.status === 'Shipped',
+                  'bg-success': order.status === 'Delivered',
+                  'bg-danger': order.status === 'Cancelled'
+                }">{{ order.status }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

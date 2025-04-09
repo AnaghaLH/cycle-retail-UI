@@ -5,7 +5,7 @@ import { CycleService } from '../../services/cycle.service';
 import { Cycle, CycleBrand, CycleType } from '../../models/cycle.model';
 import { ToastrService } from 'ngx-toastr';
 import { map, of, switchMap } from 'rxjs';
-import { CycleDto } from 'src/app/models/cycle.dto';
+import { CycleResponseDto } from 'src/app/models/cycle.dto';
 
 @Component({
   selector: 'app-cycle-form',
@@ -43,8 +43,7 @@ export class CycleFormComponent implements OnInit {
     this.cycleId = this.route.snapshot.params['id'];
     
     // Load brands and types
-    this.loadBrandsAndTypes();
-    
+    this.loadBrandsAndTypes();    
     // If editing, load the cycle data
     if (this.cycleId) {
       this.loadCycle(this.cycleId);
@@ -75,7 +74,15 @@ export class CycleFormComponent implements OnInit {
   loadCycle(id: number): void {
     this.cycleService.getCycle(id).subscribe({
       next: (cycle) => {
-        this.cycleForm.patchValue(cycle);
+        this.cycleForm.patchValue({
+          modelName: cycle.modelName,
+          price: cycle.price,
+          stockQuantity: cycle.stockQuantity,
+          description: cycle.description,
+          imageUrl: cycle.imageUrl,
+          brandId: cycle.brandId,     // dropdown uses brandId
+          typeId: cycle.typeId        // dropdown uses typeId
+        });
       },
       error: () => {
         this.toastr.error('Failed to load cycle');
@@ -91,6 +98,8 @@ onImageSelected(file: File | null): void {
   this.selectedImage = file;
   if (!file) {
     this.cycleForm.patchValue({ imageUrl: '' });
+    this.cycleForm.get('imageUrl')?.markAsDirty;
+    this.cycleForm.get('imageUrl')?.markAsTouched;
   }
 }
 
@@ -144,45 +153,101 @@ onImageSelected(file: File | null): void {
 //   }  
 // }
 
+// onSubmit(): void {
+//   if (this.cycleForm.invalid) return;
+  
+
+//   this.isSubmitting = true;
+
+//   // Extract form values
+//   const formValue = this.cycleForm.value;
+//   console.log('Form value:', formValue);
+
+//   const cycle = this.cycleForm.value as CycleDto;
+//   cycle.cycleId = Number(cycle.cycleId);
+
+//   // Find the full brand and type objects
+//   const selectedBrand = this.brands.find(b => b.brandId === formValue.brandId);
+//   const selectedType = this.types.find(t => t.typeId === formValue.typeId);
+
+//   // Construct the correct payload
+
+//   const cycleDto: CycleDto = {
+//     ...(this.cycleId && { cycleId: this.cycleId }),
+//     modelName: formValue.modelName,
+//     price: formValue.price,
+//     stockQuantity: formValue.stockQuantity,
+//     description: formValue.description,
+//     imageUrl: '', // fill if needed
+//     brandId: formValue.brandId,
+//     typeId: formValue.typeId
+//   };
+//   console.log('Payload being sent:', cycleDto);
+
+//   const operation = this.cycleId
+//     ? this.cycleService.updateCycle(this.cycleId, cycleDto)
+//     : this.cycleService.createCycle(cycleDto);
+
+//   operation.pipe(
+//     switchMap(cycle => {
+//       if (this.selectedImage) {
+//         this.isUploadingImage = true;
+//         return this.cycleService.uploadCycleImage(cycle.cycleId, this.selectedImage).pipe(
+//           map(() => cycle)
+//         );
+//       }
+//       return of(cycle);
+//     })
+//   ).subscribe({
+//     next: () => {
+//       this.toastr.success(`Cycle ${this.cycleId ? 'updated' : 'created'} successfully`);
+//       this.router.navigate(['/cycles']);
+//     },
+//     error: () => {
+//       this.toastr.error(`Failed to ${this.cycleId ? 'update' : 'create'} cycle`);
+//       this.isSubmitting = false;
+//       this.isUploadingImage = false;
+//     }
+//   });
+// }
+// }
 onSubmit(): void {
   if (this.cycleForm.invalid) return;
 
-
   this.isSubmitting = true;
 
-  // Extract form values
   const formValue = this.cycleForm.value;
-  const cycle = this.cycleForm.value as CycleDto;
-  cycle.cycleId = Number(cycle.cycleId);
+  const selectedBrand = this.brands.find(b => b.brandId === Number(formValue.brandId));
+  const selectedType = this.types.find(t => t.typeId === Number(formValue.typeId));
 
-  // Find the full brand and type objects
-  const selectedBrand = this.brands.find(b => b.brandId === formValue.brandId);
-  const selectedType = this.types.find(t => t.typeId === formValue.typeId);
-
-  // Construct the correct payload
-
-  const cycleDto: CycleDto = {
-    ...(this.cycleId && { cycleId: this.cycleId }),
+  const cycleDto: CycleResponseDto = {
     modelName: formValue.modelName,
     price: formValue.price,
     stockQuantity: formValue.stockQuantity,
     description: formValue.description,
-    imageUrl: '', // fill if needed
-    brandId: formValue.brandId,
-    typeId: formValue.typeId
+    imageUrl: '', // Will be updated if image is uploaded
+    brandId: Number(formValue.brandId),
+    brandName:selectedBrand?.brandName || '',
+    typeId: Number(formValue.typeId),
+    typeName: selectedType?.typeName || '',
+    cycleId: 0
   };
-  console.log('Payload being sent:', cycleDto);
+  if (this.cycleId) {
+    cycleDto.cycleId = this.cycleId;
+  }
 
   const operation = this.cycleId
     ? this.cycleService.updateCycle(this.cycleId, cycleDto)
     : this.cycleService.createCycle(cycleDto);
 
   operation.pipe(
-    switchMap(cycle => {
+    switchMap((cycle: CycleResponseDto) => {
+      console.log('Returned cycle with names:', cycle); // 🔍 Logs brandName and typeName
+
       if (this.selectedImage) {
         this.isUploadingImage = true;
         return this.cycleService.uploadCycleImage(cycle.cycleId, this.selectedImage).pipe(
-          map(() => cycle)
+          map(() => cycle) // return the same cycle object
         );
       }
       return of(cycle);

@@ -19,6 +19,8 @@ import { CustomersComponent } from './components/customers/customers.component';
 import { UsersComponent } from './components/users/users.component';
 import { CycleFormComponent } from './components/cycle-form/cycle-form.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
+import { OrderFormComponent } from './components/order-form/order-form.component';
+import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -37,7 +39,9 @@ export function tokenGetter() {
     CustomersComponent,
     UsersComponent,
     CycleFormComponent,
-    ImageUploadComponent
+    ImageUploadComponent,
+    OrderFormComponent,
+    OrderDetailComponent
   ],
   imports: [
     BrowserModule,

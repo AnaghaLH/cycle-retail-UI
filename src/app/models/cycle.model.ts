@@ -1,14 +1,14 @@
 export interface Cycle {
-    modelName: any;
+    $id:string;
     cycleId: number;
-    ModelName: string;
+    modelName: string;
     brandId: number;
-    brand?: {
+    brand: {
       brandId: number;
       brandName: string;
     };
     typeId: number;
-    type?: {
+    type: {
       typeId: number;
       typeName: string;
     };
@@ -21,12 +21,14 @@ export interface Cycle {
   }
   
   export interface CycleBrand {
+    $id?:string;
     brandId: number;
     brandName: string;
     description?: string;
   }
   
   export interface CycleType {
+    $id?:string;
     typeId: number;
     typeName: string;
     description?: string;
