@@ -6,6 +6,7 @@ import { Cycle, CycleBrand, CycleType } from '../../models/cycle.model';
 import { ToastrService } from 'ngx-toastr';
 import { map, of, switchMap } from 'rxjs';
 import { CycleResponseDto } from 'src/app/models/cycle.dto';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-cycle-form',
@@ -19,13 +20,17 @@ export class CycleFormComponent implements OnInit {
   brands: CycleBrand[] = [];
   types: CycleType[] = [];
   previewImage: string | null = null;
+  selectedFile: File|null=null;
+  imagePreview: string = '';
+  uploadProgress: number = 0;
 
   constructor(
     private fb: FormBuilder,
     private cycleService: CycleService,
     private route: ActivatedRoute,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private http:HttpClient
   ) {
     this.cycleForm = this.fb.group({
       cycleId: [null],
@@ -83,7 +88,11 @@ export class CycleFormComponent implements OnInit {
           brandId: cycle.brandId,     // dropdown uses brandId
           typeId: cycle.typeId        // dropdown uses typeId
         });
+        if (cycle.imageUrl) {
+          this.previewImage = cycle.imageUrl;
+        }
       },
+      
       error: () => {
         this.toastr.error('Failed to load cycle');
         this.router.navigate(['/cycles']);
@@ -94,15 +103,33 @@ export class CycleFormComponent implements OnInit {
 isUploadingImage = false;
 
 // Add this method
-onImageSelected(file: File | null): void {
-  this.selectedImage = file;
-  if (!file) {
-    this.cycleForm.patchValue({ imageUrl: '' });
-    this.cycleForm.get('imageUrl')?.markAsDirty;
-    this.cycleForm.get('imageUrl')?.markAsTouched;
+// onImageSelected(file: File | null): void {
+//   this.selectedImage = file;
+//   if (!file) {
+//     this.cycleForm.patchValue({ imageUrl: '' });
+//     this.cycleForm.get('imageUrl')?.markAsDirty;
+//     this.cycleForm.get('imageUrl')?.markAsTouched;
+//   }
+  
+// }
+// onImageSelected(file: File | null): void {
+//   if (file) {
+//     this.selectedFile = file;
+//   } else {
+//     this.selectedFile = null;  // Handle image removal
+//   }
+// }
+ onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.cycleForm.patchValue({ imageUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   }
-}
-
   // onSubmit(): void {
   //   if (this.cycleForm.invalid) return;
   
@@ -225,7 +252,7 @@ onSubmit(): void {
     price: formValue.price,
     stockQuantity: formValue.stockQuantity,
     description: formValue.description,
-    imageUrl: '', // Will be updated if image is uploaded
+    imageUrl: formValue.imageUrl, // Will be updated if image is uploaded
     brandId: Number(formValue.brandId),
     brandName:selectedBrand?.brandName || '',
     typeId: Number(formValue.typeId),
@@ -242,12 +269,27 @@ onSubmit(): void {
 
   operation.pipe(
     switchMap((cycle: CycleResponseDto) => {
+      this.cycleId=cycle.cycleId;
       console.log('Returned cycle with names:', cycle); // 🔍 Logs brandName and typeName
 
       if (this.selectedImage) {
         this.isUploadingImage = true;
-        return this.cycleService.uploadCycleImage(cycle.cycleId, this.selectedImage).pipe(
-          map(() => cycle) // return the same cycle object
+        const formData = new FormData();
+        formData.append('file', this.selectedImage, this.selectedImage.name);
+        return this.http.post<any>(`http://localhost:5081/api/cycles/${cycle.cycleId}/upload-image`, formData, {
+          reportProgress: true,
+          observe: 'events'
+        }).pipe(
+          map(event => {
+            if (event.type === HttpEventType.UploadProgress && event.total) {
+              this.uploadProgress = Math.round(100 * event.loaded / event.total);
+            } else if (event.type === HttpEventType.Response) {
+              const imageUrl = event.body.imageUrl;
+              this.imagePreview = imageUrl;
+              cycle.imageUrl = imageUrl; // update cycle with uploaded image URL
+            }
+            return cycle;
+          })
         );
       }
       return of(cycle);

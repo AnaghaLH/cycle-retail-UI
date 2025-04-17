@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cycle } from '../models/cycle.model';
 // import { environment } from '../../environments/environment';
@@ -20,9 +20,7 @@ export class CycleService {
       console.error('No token available');
       throw new Error('Authentication token missing');
     }
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
   
   getCyclesPaginated(page: number, pageSize: number, filters: any): Observable<any> {
@@ -74,10 +72,10 @@ export class CycleService {
       headers: this.getAuthHeaders()
     });
   }
-  uploadCycleImage(cycleId: number, file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/${cycleId}/upload-image`, formData);
-  }
-  
+// cycle.service.ts
+uploadCycleImage(cycleId: number, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return this.http.post(`${this.apiUrl}/cycles/${cycleId}/upload-image`, formData);
+}
 }

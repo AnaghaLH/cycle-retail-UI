@@ -14,6 +14,13 @@
           <span *ngIf="!collapsed">Dashboard</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/cycle-shop" routerLinkActive="active">
+          <i class="fa fa-bicycle me-2"></i>
+          <span *ngIf="!collapsed">Cycle Shop</span>
+        </a>
+      </li>
+      
       
       <li class="nav-item">
         <a class="nav-link" routerLink="/cycles" routerLinkActive="active">
@@ -42,7 +49,7 @@
           <small class="text-muted ps-3">Admin</small>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="authService.isAdmin()">
           <a class="nav-link" routerLink="/users" routerLinkActive="active">
             <i class="fa fa-user-cog me-2"></i>
             <span *ngIf="!collapsed">User Management</span>

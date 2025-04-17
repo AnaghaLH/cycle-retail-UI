@@ -6,14 +6,29 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-6">
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label class="form-label">Customer</label>
               <select class="form-select" formControlName="customerId" (change)="loadCustomerOrders()">
                 <option *ngFor="let customer of customers" [value]="customer.customerId">
                   {{ customer.firstName }} {{ customer.lastName }}
                 </option>
               </select>
-            </div>
+            </div> -->
+            <div class="mb-3">
+  <label class="form-label">Customer</label>
+  <input type="text" class="form-control" [(ngModel)]="customerSearch" 
+         [ngModelOptions]="{standalone: true}" (input)="searchCustomers()"
+         placeholder="Search customers...">
+  <div class="list-group mt-2" *ngIf="filteredCustomers.length > 0">
+    <button type="button" class="list-group-item list-group-item-action" 
+            *ngFor="let customer of filteredCustomers"
+            (click)="selectCustomer(customer)">
+      {{ customer.firstName }} {{ customer.lastName }}
+      <small class="text-muted d-block">{{ customer.email }}</small>
+    </button>
+  </div>
+</div>
+
           </div>
           <!-- <div class="col-md-6">
             <div class="mb-3">
@@ -40,6 +55,7 @@
               <tbody formArrayName="items">
                 <tr *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i">
                   <td>
+                    
                     <select class="form-select form-select-sm" formControlName="cycleId" 
                             (change)="onCycleChange(i)">
                       <option value="">Select Cycle</option>
@@ -49,6 +65,7 @@
                       </option>
                     </select>
                   </td>
+                  
                   <td>
                     <input type="number" class="form-control form-control-sm" formControlName="unitPrice" readonly>
                   </td>
@@ -114,10 +131,10 @@
           <tbody>
             <tr *ngFor="let order of customerOrders">
               <td>{{ order.orderId }}</td>
-              <td>{{ order.orderDate | date:'shortDate' }}</td>
-              <!-- <td>{{ order.orderItems.length ||0}}</td> -->
-              <td>{{ (order.orderItems || []).length }}</td>
-
+              <td>{{ order.orderDate | date: 'shortDate' }}</td>
+          
+              <!-- ✅ Display total quantity across all items in the order -->
+              <td>{{ getTotalQuantity(order) }}</td>
               <td>{{ order.totalAmount | currency }}</td>
               <td>
                 <span class="badge" [ngClass]="{
@@ -130,6 +147,7 @@
               </td>
             </tr>
           </tbody>
+          
         </table>
       </div>
     </div>

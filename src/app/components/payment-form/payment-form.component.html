@@ -1,0 +1,39 @@
+<div class="payment-form-container">
+  <h2>Make a Payment</h2>
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="orderId">Order ID:</label>
+      <input id="orderId" formControlName="orderId" type="number">
+    </div>
+
+    <div class="form-group">
+      <label for="amount">Amount:</label>
+      <input id="amount" formControlName="amount" type="number">
+    </div>
+
+    <div class="form-group">
+      <label for="paymentMethod">Payment Method:</label>
+      <select id="paymentMethod" formControlName="paymentMethod">
+        <option value="Cash">Cash</option>
+        <option value="Card">Card</option>
+        <option value="UPI">UPI</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="transactionId">Transaction ID:</label>
+      <input id="transactionId" formControlName="transactionId" type="text">
+    </div>
+
+    <div class="form-group">
+      <label for="status">Status:</label>
+      <select id="status" formControlName="status">
+        <option value="Completed">Completed</option>
+        <option value="Pending">Pending</option>
+        <option value="Failed">Failed</option>
+      </select>
+    </div>
+
+    <button type="submit">Submit Payment</button>
+  </form>
+</div>

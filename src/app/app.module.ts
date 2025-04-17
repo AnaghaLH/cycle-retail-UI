@@ -21,6 +21,12 @@ import { CycleFormComponent } from './components/cycle-form/cycle-form.component
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { OrderFormComponent } from './components/order-form/order-form.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { CustomerFormComponent } from './components/customer-form/customer-form.component';
+import { CustomerDetailComponent } from './components/customer-detail/customer-detail.component';
+import { PaymentFormComponent } from './components/payment-form/payment-form.component';
+import { ProfileComponent } from './profile/profile.component';
+import { CycleDetailComponent } from './components/cycle-detail/cycle-detail.component';
+import { CycleShopComponent } from './components/cycle-shop/cycle-shop.component';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -41,7 +47,13 @@ export function tokenGetter() {
     CycleFormComponent,
     ImageUploadComponent,
     OrderFormComponent,
-    OrderDetailComponent
+    OrderDetailComponent,
+    CustomerFormComponent,
+    CustomerDetailComponent,
+    PaymentFormComponent,
+    ProfileComponent,
+    CycleDetailComponent,
+    CycleShopComponent
   ],
   imports: [
     BrowserModule,

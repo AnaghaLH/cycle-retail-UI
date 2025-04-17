@@ -1,0 +1,127 @@
+// cycle-shop.component.scss
+.cycle-card {
+    transition: transform 0.3s ease;
+    height: 100%;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .price {
+      font-weight: bold;
+      color: #28a745;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .filter-card {
+    position: sticky;
+    top: 20px;
+  }
+  
+  .mini-cart {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    
+    &.open {
+      right: 0;
+    }
+    
+    .mini-cart-header {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .mini-cart-body {
+      padding: 15px;
+      height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+    
+    .cart-item {
+      display: flex;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f5f5f5;
+      
+      img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        margin-right: 15px;
+      }
+      
+      .item-details {
+        flex: 1;
+      }
+      
+      .quantity-control {
+        display: flex;
+        align-items: center;
+        
+        button {
+          padding: 0 8px;
+        }
+        
+        span {
+          margin: 0 10px;
+        }
+      }
+    }
+    
+    .mini-cart-footer {
+      padding: 15px;
+      border-top: 1px solid #eee;
+      
+      .total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+    }
+  }
+  
+  .cart-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .mini-cart {
+      width: 100%;
+    }
+  }

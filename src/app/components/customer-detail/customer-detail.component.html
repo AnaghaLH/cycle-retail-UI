@@ -1,0 +1,88 @@
+<div class="row" *ngIf="customer">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Customer Details</h5>
+          <div class="btn-group">
+            <a [routerLink]="['/customers', customer.customerId, 'edit']" class="btn btn-sm btn-outline-primary">
+              <i class="fa fa-edit"></i> Edit
+            </a>
+            <button (click)="deleteCustomer()" class="btn btn-sm btn-outline-danger">
+              <i class="fa fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-sm-4 fw-bold">Name:</div>
+            <div class="col-sm-8">{{ customer.firstName }} {{ customer.lastName }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 fw-bold">Email:</div>
+            <div class="col-sm-8">{{ customer.email || 'N/A' }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 fw-bold">Phone:</div>
+            <div class="col-sm-8">{{ customer.phone || 'N/A' }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 fw-bold">Address:</div>
+            <div class="col-sm-8">{{ customer.address || 'N/A' }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 fw-bold">Member Since:</div>
+            <div class="col-sm-8">{{ customer.createdAt | date:'mediumDate' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Order History</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="orders.length > 0; else noOrders">
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let order of orders">
+                    <td>
+                      <a [routerLink]="['/orders', order.orderId]">{{ order.orderId }}</a>
+                    </td>
+                    <td>{{ order.orderDate | date:'shortDate' }}</td>
+                    <td>{{ order.totalAmount | currency }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'bg-warning': order.status === 'Pending',
+                        'bg-info': order.status === 'Processing',
+                        'bg-primary': order.status === 'Shipped',
+                        'bg-success': order.status === 'Delivered',
+                        'bg-danger': order.status === 'Cancelled'
+                      }">{{ order.status }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <ng-template #noOrders>
+            <p class="text-muted">No orders found for this customer</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="customer-actions">
+      <a routerLink="/payment" class="btn btn-primary">Pay Now</a>
+    </div>
+    
+    

@@ -1,0 +1,24 @@
+/* user-management.component.scss */
+.card {
+    margin-top: 20px;
+  }
+  
+  .table {
+    th {
+      font-weight: 600;
+    }
+  }
+  
+  .btn-group {
+    .btn {
+      margin-right: 5px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  
+  .form-control-sm, .form-select-sm {
+    max-width: 200px;
+    display: inline-block;
+  }

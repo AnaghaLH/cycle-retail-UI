@@ -34,8 +34,11 @@ export class OrdersComponent implements OnInit {
     this.orderService.getOrders().subscribe({
       next: (orders) => {
         this.orders = orders;
+        console.log(this.orders);
         this.applyFilters();
         this.isLoading = false;
+        
+
       },
       error: (error) => {
         this.toastr.error('Failed to load orders');
@@ -54,8 +57,9 @@ export class OrdersComponent implements OnInit {
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(order => 
-        order.customer?.firstName.toLowerCase().includes(query) ||
-        order.customer?.lastName.toLowerCase().includes(query) ||
+        // order.customer?.firstName.toLowerCase().includes(query) ||
+        // order.customer?.lastName.toLowerCase().includes(query) ||
+        order.customerName.toLowerCase().includes(query) ||
         order.orderId.toString().includes(query)
       );
     }

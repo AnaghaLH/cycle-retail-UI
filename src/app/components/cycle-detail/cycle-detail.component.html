@@ -1,0 +1,79 @@
+<div class="cycle-detail-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  
+    <!-- Cycle Details Card -->
+    <div *ngIf="cycle" class="card detail-card">
+      <div class="card-header">
+        <button class="btn btn-back" (click)="backToList()">
+          <i class="fas fa-arrow-left"></i> Back to Inventory
+        </button>
+        <h3 class="text-center">{{ cycle.modelName }}</h3>
+      </div>
+  
+      <div class="card-body">
+        <div class="row">
+          <!-- Cycle Image Column -->
+          <div class="col-lg-6">
+            <div class="cycle-image-container">
+              <img [src]="'assets/cycle1.jpg'" 
+                   [alt]="cycle.modelName"
+                   class="img-fluid cycle-image">
+            </div>
+          </div>
+  
+          <!-- Details Column -->
+          <div class="col-lg-6">
+            <div class="details-section">
+              <h4 class="section-title">Specifications</h4>
+              
+              <div class="detail-row">
+                <span class="detail-label">Brand:</span>
+                <span class="detail-value">{{ cycle.brand.brandName }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <span class="detail-label">Type:</span>
+                <span class="detail-value">{{ cycle.type.typeName }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <span class="detail-label">Price:</span>
+                <span class="detail-value price">{{ cycle.price | currency:'USD':'symbol':'1.2-2' }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <span class="detail-label">Stock:</span>
+                <span class="detail-value" 
+                      [ngClass]="{
+                        'text-danger': cycle.stockQuantity <= 2,
+                        'text-warning': cycle.stockQuantity > 2 && cycle.stockQuantity <= 5
+                      }">
+                  {{ cycle.stockQuantity }} available
+                </span>
+              </div>
+  
+              <!-- Description -->
+              <div *ngIf="cycle.description" class="description-section">
+                <h4 class="section-title">Description</h4>
+                <p class="description-text">{{ cycle.description }}</p>
+              </div>
+  
+              <!-- Payment Button -->
+              <div class="action-buttons">
+                <button class="btn btn-rent" 
+                        (click)="proceedToPayment()"
+                        [disabled]="cycle.stockQuantity <= 0">
+                  <i class="fas fa-shopping-cart me-2"></i> Rent Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
