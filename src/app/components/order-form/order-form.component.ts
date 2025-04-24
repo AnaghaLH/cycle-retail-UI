@@ -12,6 +12,7 @@ import { Cycle } from 'src/app/models/cycle.model';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-order-form',
@@ -25,6 +26,8 @@ export class OrderFormComponent implements OnInit {
   availableCycles: Cycle[] = [];
   customerOrders: Order[] = [];
   orderTotal = 0;
+  customerSearch: string = '';
+filteredCustomers: Customer[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -43,17 +46,48 @@ export class OrderFormComponent implements OnInit {
     });
   }
   currentUser: any;
+  // ngOnInit(): void {
+  //   this.loadCustomerOrders();
+  //   this.loadAvailableCycles();
+  //   this.currentUser = this.authService.currentUserValue;
+  //   if (this.currentUser?.role === 'Employee') {
+  //     this.orderForm.patchValue({
+  //       employeeId: this.currentUser.userId
+  //     });
+  //   }
+  //   this.loadCustomers();
+  //   this.orderService.getOrders().subscribe({
+  //     next: (orders) => {
+  //       // ✅ See if items/quantity are there
+  //       this.customerOrders = orders;
+  //       console.log('Sample order:', this.customerOrders[3]);
+  //     },
+  //     error: (err) => {
+  //       console.error('❌ Failed to load orders:', err);
+  //     }
+  //   });
+  //   }
   ngOnInit(): void {
-    this.loadCustomers();
     this.loadAvailableCycles();
+    this.loadCustomerOrders();
+    this.loadCustomers();
     this.currentUser = this.authService.currentUserValue;
     if (this.currentUser?.role === 'Employee') {
-      this.orderForm.patchValue({
-        employeeId: this.currentUser.userId
-      });
-    }
+      this.orderForm.patchValue({ employeeId: this.currentUser.userId });
     }
   
+    this.customerService.getCustomers().subscribe(customers => {
+      this.customers = customers;
+    });
+  
+    // Load all orders (ensure includes OrderDetails)
+    this.orderService.getOrders().subscribe(orders => {
+      this.customerOrders = orders;
+      console.log('Loaded orders with details:', orders);
+    });
+  }
+  
+
 
   get orderItems(): FormArray {
     return this.orderForm.get('items') as FormArray;
@@ -61,10 +95,10 @@ export class OrderFormComponent implements OnInit {
 
   createOrderItem(): FormGroup {
     return this.fb.group({
-      cycleId: ['', Validators.required],
+      cycleId: [null, Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
       unitPrice: [0, [Validators.required, Validators.min(0)]]
-    });
+    })
   }
 
   addItem(): void {
@@ -81,11 +115,23 @@ export class OrderFormComponent implements OnInit {
       this.customers = customers;
       if (customers.length > 0) {
         this.orderForm.patchValue({ customerId: customers[0].customerId });
-        this.loadCustomerOrders();
+        //this.loadCustomerOrders();
       }
     });
   }
-
+  
+  getTotalQuantity(order: Order): number {
+    
+    if (!order.items) return 0;
+    return order.items?.reduce((total, item) => total + item.quantity, 0)||0;
+  }
+  // getTotalQuantity(order: Order): number {
+  //   return Array.isArray(order.items)
+  //     ? order.items.reduce((total, item) => total + (item.quantity || 0), 0)
+  //     : 0;
+  // }
+  
+  
 
   loadAvailableCycles(): void {
     this.cycleService.getCycles().subscribe(cycles => {
@@ -103,10 +149,11 @@ export class OrderFormComponent implements OnInit {
     });
   }
   
-
+  selectedCustomerId: number | null = null;
   loadCustomerOrders(): void {
     const customerId = this.orderForm.value.customerId;
     if (customerId) {
+      this.selectedCustomerId = customerId; 
       this.orderService.getCustomerOrders(customerId).subscribe(orders => {
         this.customerOrders = orders;
       });
@@ -129,7 +176,7 @@ export class OrderFormComponent implements OnInit {
     const itemGroup = items.at(index) as FormGroup;
     const selectedCycleId = +itemGroup.get('cycleId')?.value;
   
-    const selectedCycle = this.availableCycles.find(c => c.cycleId === selectedCycleId);
+    const selectedCycle = this.availableCycles.find(c => c.cycleId === +selectedCycleId);
     console.log('Selected cycle:', selectedCycle);
   
     if (selectedCycle) {
@@ -165,6 +212,20 @@ export class OrderFormComponent implements OnInit {
       return total + (quantity * unitPrice);
     }, 0);
   }
+  searchCustomers() {
+  const query = this.customerSearch.toLowerCase();
+  this.filteredCustomers = this.customers.filter(c =>
+    `${c.firstName} ${c.lastName}`.toLowerCase().includes(query) ||
+    c.email.toLowerCase().includes(query)
+  );
+}
+
+selectCustomer(customer: Customer) :void {
+  this.customerSearch = `${customer.firstName} ${customer.lastName}`;
+  this.filteredCustomers = [];
+  this.orderForm.get('customerId')?.setValue(customer.customerId);
+  this.loadCustomerOrders(); // Optional: trigger loading previous orders
+}
   
 
   // onSubmit(): void {
@@ -196,20 +257,43 @@ export class OrderFormComponent implements OnInit {
   //   });
   // }
   onSubmit(): void {
-    if (this.orderForm.invalid) return;
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
   
     this.isSubmitting = true;
+  
     const currentUser = this.authService.currentUserValue;
+    if (!currentUser) {
+      this.toastr.error('User is not authenticated');
+      this.isSubmitting = false;
+      return;
+    }
   
     const rawItems = this.orderForm.value.items;
+  
+    // ✅ Extra validation: Check if any item is missing cycleId or unitPrice
+    const hasInvalidItems = rawItems.some((item: any) => {
+      return !item.cycleId || item.unitPrice === null || item.unitPrice === undefined;
+    });
+  
+    if (hasInvalidItems) {
+      this.toastr.warning('Please select a valid cycle and ensure prices are filled for all items.');
+      this.isSubmitting = false;
+      return;
+    }
+  
     const items = rawItems.map((item: any) => ({
       ...item,
       cycleId: +item.cycleId // Ensure it's a number
     }));
   
+    console.log('Raw Items:', rawItems); // ✅ Check contents
+  
     const orderData: OrderCreateDto = {
       customerId: this.orderForm.value.customerId,
-      employeeId: Number(currentUser.userId),
+      userId: Number(currentUser.userId),
       items
     };
   
@@ -217,6 +301,7 @@ export class OrderFormComponent implements OnInit {
   
     this.orderService.createOrder(orderData).subscribe({
       next: () => {
+        this.isSubmitting=false;
         this.toastr.success('Order created successfully');
         this.router.navigate(['/orders']);
       },
@@ -226,6 +311,9 @@ export class OrderFormComponent implements OnInit {
         this.isSubmitting = false;
       }
     });
+  
+    console.log('Sending order to backend:', JSON.stringify(orderData, null, 2));
   }
+  
   
 }

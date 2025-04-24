@@ -39,6 +39,7 @@
         <table class="table table-hover">
           <thead>
             <tr>
+              <th>Image</th>
               <th>Model</th>
               <th>Brand</th>
               <th>Type</th>
@@ -49,6 +50,27 @@
           </thead>
           <tbody>
             <tr *ngFor="let cycle of pagedCycles">
+              
+              <td>
+                <!-- <img *ngIf="cycle.imageUrl; else defaultImage" 
+                     [src]="getImageUrl(cycle.imageUrl)" 
+                     #fileInput
+                     alt="{{ cycle.modelName }}" 
+                     width="60" 
+                     height="40" 
+                     class="rounded shadow-sm cursor-pointer"
+                     (click)="navigateToDetail(cycle.cycleId)" />
+                
+                <ng-template #defaultImage>
+                  <img src="assets/cycle1.jpg" 
+                       alt="{{ cycle.modelName }}" 
+                       width="60" 
+                       height="40" 
+                       class="rounded shadow-sm cursor-pointer"
+                       (click)="navigateToDetail(cycle.cycleId)" />
+                </ng-template> -->
+                <img *ngIf="cycle.imageUrl" [src]="cycle.imageUrl" alt="Cycle Image" class="cycle-image" style="width: 100px; height: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);" />
+              </td>
               <td>
                 <a [routerLink]="['/cycles', cycle.cycleId]" class="text-decoration-none">
                   {{ cycle.modelName }}
@@ -74,6 +96,7 @@
                   <button (click)="deleteCycle(cycle.cycleId)" class="btn btn-outline-danger" [disabled]="!authService.isAdmin()">
                     <i class="fa fa-trash"></i>
                   </button>
+                  
                 </div>
               </td>
             </tr>

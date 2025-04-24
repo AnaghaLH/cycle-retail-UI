@@ -1,0 +1,113 @@
+<!-- reports.component.html -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Cycle POS Reports</h5>
+      <div class="d-flex gap-2">
+        <nz-range-picker 
+          [(ngModel)]="dateRange" 
+          (ngModelChange)="onDateRangeChange()"
+          [nzAllowClear]="false">
+        </nz-range-picker>
+        <div class="btn-group">
+          <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fa fa-download me-1"></i> Export
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" (click)="exportReport('PDF')">PDF</a></li>
+            <li><a class="dropdown-item" (click)="exportReport('Excel')">Excel</a></li>
+            <li><a class="dropdown-item" (click)="exportReport('CSV')">CSV</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+  
+      <div *ngIf="!isLoading">
+        <!-- Sales Performance -->
+        <div class="row mb-4">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h6>Sales Performance</h6>
+              </div>
+              <div class="card-body">
+                <div echarts [options]="chartOptions.salesChart" style="height: 400px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6>Sales Summary</h6>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <h3 class="text-primary">{{ reportData.sales?.totalSales | currency }}</h3>
+                  <small class="text-muted">Total Revenue</small>
+                </div>
+                <div class="mb-3">
+                  <h3>{{ reportData.sales?.totalOrders }}</h3>
+                  <small class="text-muted">Total Orders</small>
+                </div>
+                <div class="mb-3">
+                  <h3>{{ reportData.sales?.avgOrderValue | currency }}</h3>
+                  <small class="text-muted">Average Order Value</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Inventory Status -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6>Inventory Status</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-4 text-center">
+                    <h2 class="text-success">{{ inventoryStatus.totalInStock }}</h2>
+                    <small class="text-muted">In Stock</small>
+                  </div>
+                  <div class="col-4 text-center">
+                    <h2 class="text-warning">{{ inventoryStatus.lowStock }}</h2>
+                    <small class="text-muted">Low Stock</small>
+                  </div>
+                  <div class="col-4 text-center">
+                    <h2 class="text-danger">{{ inventoryStatus.outOfStock }}</h2>
+                    <small class="text-muted">Out of Stock</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6>Top Selling Cycles</h6>
+              </div>
+              <div class="card-body">
+                <div class="list-group">
+                  <div *ngFor="let cycle of popularCycles" class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <span>{{ cycle.modelName }}</span>
+                      <span class="badge bg-primary rounded-pill">{{ cycle.totalSold }}</span>
+                    </div>
+                    <small class="text-muted">{{ cycle.brandName }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

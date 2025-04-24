@@ -1,0 +1,127 @@
+.customer-card {
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.customer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.customer-card .profile-section {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+.customer-card .profile-section .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.customer-card .profile-section .profile-info {
+  margin-left: 1rem;
+}
+.customer-card .profile-section .profile-info .name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #343a40;
+}
+.customer-card .profile-section .profile-info .title {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+.customer-card .details-section {
+  padding: 1.5rem;
+}
+.customer-card .details-section .detail-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+  font-size: 0.9375rem;
+}
+.customer-card .details-section .detail-row:last-child {
+  margin-bottom: 0;
+}
+.customer-card .details-section .detail-row .label {
+  font-weight: 600;
+  color: #495057;
+  min-width: 100px;
+}
+.customer-card .details-section .detail-row .value {
+  color: #212529;
+}
+.customer-card .actions-section {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+.customer-card .actions-section .btn {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.customer-card .actions-section .btn.btn-primary {
+  background-color: #4361ee;
+  color: white;
+  border: none;
+}
+.customer-card .actions-section .btn.btn-primary:hover {
+  background-color: #153ae9;
+}
+.customer-card .actions-section .btn.btn-outline {
+  background-color: transparent;
+  border: 1px solid #adb5bd;
+  color: #495057;
+}
+.customer-card .actions-section .btn.btn-outline:hover {
+  background-color: #e9ecef;
+}
+.customer-card .status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.customer-card .status.active {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+.customer-card .status.inactive {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+@media (max-width: 576px) {
+  .customer-card .profile-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  .customer-card .profile-section .profile-info {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+  .customer-card .actions-section {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .customer-card .actions-section .btn {
+    width: 100%;
+  }
+}/*# sourceMappingURL=customers.component.css.map */

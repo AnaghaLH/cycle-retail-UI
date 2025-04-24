@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Customer } from '../models/customer.model';
+import { Customer, CustomerCreateDto } from '../models/customer.model';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -29,7 +29,7 @@ export class CustomerService {
     });
   }
 
-  createCustomer(customer: Customer): Observable<Customer> {
+  createCustomer(customer: CustomerCreateDto): Observable<Customer> {
     return this.http.post<Customer>(this.apiUrl, customer, {
       headers: this.getAuthHeaders()
     });

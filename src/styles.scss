@@ -2,11 +2,13 @@
 /* Import Bootstrap */
 @import 'bootstrap/scss/bootstrap';
 @import 'font-awesome/css/font-awesome.min.css';
+@import 'ngx-toastr/toastr';
 
 /* Global Styles */
 body {
   background-color: #f8f9fa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 }
 
 .container {
@@ -35,6 +37,8 @@ body {
   
   &.with-sidebar {
     margin-left: 250px;
+    
+    
     
     &.sidebar-collapsed {
       margin-left: 60px;

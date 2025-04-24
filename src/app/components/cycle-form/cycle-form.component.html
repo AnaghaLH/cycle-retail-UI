@@ -58,8 +58,9 @@
         <!-- Replace the imageUrl input with the upload component -->
             <div class="mb-3">
               <label class="form-label">Cycle Image</label>
-              <app-image-upload (imageSelected)="onImageSelected($event)"></app-image-upload>
-              <small class="text-muted">Upload a high-quality image of the cycle</small>
+              <!-- <app-image-upload (imageSelected)="onImageSelected($event)"></app-image-upload> -->
+              <input type="file" (change)="onFileSelected($event)">
+              <button type="submit" [disabled]="!selectedFile">Upload Image</button>
             </div>
             </div>
             </div>

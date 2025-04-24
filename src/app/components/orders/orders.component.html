@@ -43,7 +43,7 @@
               <td>{{ order.orderId }}</td>
               <td>
                 <a [routerLink]="['/customers', order.customerId]">
-                  {{ order.customer?.firstName }} {{ order.customer?.lastName }}
+                  {{ order.customerName }}
                 </a>
               </td>
               <td>{{ order.orderDate | date:'mediumDate' }}</td>

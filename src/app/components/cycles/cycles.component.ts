@@ -3,7 +3,9 @@ import { CycleService } from '../../services/cycle.service';
 import { Cycle, CycleBrand, CycleType } from '../../models/cycle.model';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, } from '@angular/forms';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-cycles',
   templateUrl: './cycles.component.html',
@@ -23,10 +25,12 @@ filteredCycles: Cycle[] = [];
 currentPage=1;
 itemsPerPage=5;
 totalItems=0;
+timestamp = Date.now(); 
   constructor(
     private cycleService: CycleService,
     public authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router:Router
   ) { }
  
   
@@ -119,8 +123,11 @@ totalItems=0;
       next: (response) => {
 
         console.log('👉 response:', response);
+      
        
-        this.cycles = Array.isArray(response) ? response : response?.$values;; 
+        this.cycles = Array.isArray(response) ? response : response?.$values;
+        console.log('👉 cycles image URL check: ', this.cycles.map(cycle => cycle.imageUrl));
+
         this.applyFilters(); 
         this.isLoading = false;
       },
@@ -130,6 +137,31 @@ totalItems=0;
       }
     });
   }
+ 
+    onImageUpload(event: any, cycleId: number): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.cycleService.uploadCycleImage(cycleId, file).subscribe({
+        next: (response) => {
+          this.refreshImages();
+          // Update local data
+          const index = this.cycles.findIndex(c => c.cycleId === cycleId);
+          if (index !== -1) {
+            this.cycles[index].imageUrl = response.imageUrl;
+            this.filteredCycles = [...this.cycles]; // Trigger change detection
+          }
+          this.toastr.success('Image updated successfully');
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error('Failed to update image');
+        }
+      });
+    }
+  }
+
+  // Add this helper method
+
   applyFilters(): void {
     if (!this.cycles) return;
   
@@ -167,16 +199,26 @@ totalItems=0;
   }
 
   deleteCycle(id: number): void {
-    if (!confirm('Are you sure you want to delete this cycle?')) return;
-
-    this.cycleService.deleteCycle(id).subscribe({
-      next: () => {
-        
-        this.toastr.success('Cycle deleted successfully');
-        this.loadCycles();
-      },
-      error: () => {
-        this.toastr.error('Failed to delete cycle');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This cycle will be permanently deleted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cycleService.deleteCycle(id).subscribe({
+          next: () => {
+            this.toastr.success('Cycle deleted successfully');
+            this.loadCycles();
+          },
+          error: () => {
+            this.toastr.error('Failed to delete cycle');
+          }
+        });
       }
     });
   }
@@ -199,10 +241,26 @@ totalItems=0;
   
   return pages;
 }
+// Add this to your component class
+
+
+getImageUrl(imagePath: string): string {
+  if (!imagePath) return '';
+  
+  // Add cache-busting parameter
+  return `http://localhost:5081${imagePath.trim()}?t=${this.timestamp}`;
+}
+
+// Call this after successful edit to refresh images
+refreshImages() {
+  this.timestamp = Date.now();
+}
 get pagedCycles(): Cycle[] {
   const start = (this.currentPage - 1) * this.itemsPerPage;
   return this.filteredCycles.slice(start, start + this.itemsPerPage);
 }
-
+navigateToDetail(cycleId: number): void {
+  this.router.navigate(['/cycles', cycleId, 'view']);
+}
   
 }

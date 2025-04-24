@@ -1,25 +1,28 @@
 <div class="image-upload-container">
-    <div class="image-preview" *ngIf="imagePreview">
-      <img [src]="imagePreview" class="img-thumbnail">
-      <button class="btn btn-sm btn-danger remove-btn" (click)="removeImage()">
-        <i class="fa fa-times"></i>
+  <div class="image-preview" *ngIf="imagePreview">
+    <img [src]="imagePreview" class="img-thumbnail" alt="Preview">
+    <button class="btn btn-sm btn-danger remove-btn" (click)="removeImage()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <div class="upload-area" [class.active]="isDragging"
+       (drop)="onDrop($event)" 
+       (dragover)="onDragOver($event)" 
+       (dragleave)="onDragLeave($event)">
+       
+    <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden>
+
+    <div *ngIf="!imagePreview" class="upload-placeholder">
+      <i class="fa fa-cloud-upload fa-3x mb-2"></i>
+      <p>Drag & drop image here or click to browse</p>
+      <button type="button" class="btn btn-primary btn-sm" (click)="fileInput.click()">
+        Select Image
       </button>
     </div>
-    
-    <div class="upload-area" [class.active]="isDragging" (drop)="onDrop($event)" 
-         (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)">
-      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden>
-      
-      <div *ngIf="!imagePreview" class="upload-placeholder">
-        <i class="fa fa-cloud-upload fa-3x mb-2"></i>
-        <p>Drag & drop image here or click to browse</p>
-        <button type="button" class="btn btn-primary btn-sm" (click)="fileInput.click()">
-          Select Image
-        </button>
-      </div>
-    </div>
-    
-    <div *ngIf="uploadProgress !== null" class="progress mt-2">
-      <div class="progress-bar" [style.width.%]="uploadProgress"></div>
-    </div>
   </div>
+
+  <div *ngIf="uploadProgress !== null" class="progress mt-2">
+    <div class="progress-bar" [style.width.%]="uploadProgress"></div>
+  </div>
+</div>

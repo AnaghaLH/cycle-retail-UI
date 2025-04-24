@@ -1,0 +1,64 @@
+<form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{ customerId ? 'Edit Customer' : 'Add New Customer' }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" formControlName="firstName">
+              <div *ngIf="customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched" 
+                   class="invalid-feedback d-block">
+                First name is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" formControlName="lastName">
+              <div *ngIf="customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched" 
+                   class="invalid-feedback d-block">
+                Last name is required
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" formControlName="email">
+              <div *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched" 
+                   class="invalid-feedback d-block">
+                Please enter a valid email
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" formControlName="phone">
+            </div>
+          </div>
+        </div>
+  
+        <div class="mb-3">
+          <label class="form-label">Address</label>
+          <textarea class="form-control" formControlName="address" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/customers">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid || isSubmitting">
+          <span *ngIf="!isSubmitting">Save</span>
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </form>

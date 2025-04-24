@@ -1,27 +1,35 @@
-<nav class="navbar navbar-expand navbar-dark bg-primary shadow-sm">
-    <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/">Cycle Retail Shop</a>
-      
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="fa fa-user me-1"></i>
-            {{ authService.currentUserValue?.username }} ({{ authService.currentUserValue?.role }})
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <!-- Common for all roles -->
-            <li><a class="dropdown-item" routerLink="/profile"><i class="fa fa-user me-1"></i> Profile</a></li>
-            <li><hr class="dropdown-divider"></li>
-            
-            <!-- Admin Only -->
-            <ng-container *ngIf="authService.isAdmin()">
-              <li><a class="dropdown-item" routerLink="/admin-settings"><i class="fa fa-cog me-1"></i> Admin Settings</a></li>
-              <li><hr class="dropdown-divider"></li>
-            </ng-container>
-            
-            <li><a class="dropdown-item" (click)="authService.logout()"><i class="fa fa-sign-out me-1"></i> Logout</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </nav>
+<nav class="navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">
+      <i class="fa fa-bicycle"></i>
+      Cycle Retail Shop
+    </a>
+    
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="fa fa-user"></i>
+          {{ authService.currentUserValue?.username }}
+          <span class="badge bg-primary ms-2">{{ authService.currentUserValue?.role }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <!-- Common for all roles -->
+          <li>
+            <a class="dropdown-item" routerLink="/profile">
+              <i class="fa fa-user"></i> Profile
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          
+          
+          
+          <li>
+            <a class="dropdown-item" (click)="authService.logout()">
+              <i class="fa fa-sign-out"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
