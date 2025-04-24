@@ -2,6 +2,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CycleService } from 'src/app/services/cycle.service';
 import { CartService } from 'src/app/services/cart.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+import { OrderService } from 'src/app/services/order.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { CustomerService } from 'src/app/services/customer.service';
+import { Customer, CustomerCreateDto } from 'src/app/models/customer.model';
+
 @Component({
   selector: 'app-cycle-shop',
   templateUrl: './cycle-shop.component.html',
@@ -32,7 +40,12 @@ export class CycleShopComponent implements OnInit {
 
   constructor(
     private cycleService: CycleService,
-    private cartService: CartService
+    private cartService: CartService,
+    private router: Router,
+    private toastr: ToastrService,
+    private orderService: OrderService,
+    private authService: AuthService,
+    private customerService: CustomerService
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +61,10 @@ export class CycleShopComponent implements OnInit {
         this.cycles = Array.isArray(cyclesArray) ? cyclesArray : [];
         this.filteredCycles = [...this.cycles];
       },
-      error: (err) => console.error('Error loading cycles', err)
+      error: (err) => {
+        console.error('Error loading cycles', err);
+        this.toastr.error('Failed to load cycles');
+      }
     });
   }
 
@@ -75,16 +91,27 @@ export class CycleShopComponent implements OnInit {
   }
 
   addToCart(cycle: any): void {
+    if (cycle.stockQuantity <= 0) {
+      this.toastr.warning('This item is out of stock');
+      return;
+    }
+
     const added = this.cartService.addItem(cycle);
     if (added) {
       this.cartItems = this.cartService.getItems();
       this.cartOpen = true;
+      this.toastr.success('Item added to cart');
+    } else {
+      this.toastr.error('Failed to add item to cart');
     }
   }
   updateQuantity(item: any, change: number): void {
     const updated = this.cartService.updateQuantity(item, change);
     if (updated) {
       this.cartItems = this.cartService.getItems();
+      this.toastr.success('Cart updated');
+    } else {
+      this.toastr.error('Failed to update cart');
     }
   }
   toggleCart(): void {
@@ -97,7 +124,58 @@ export class CycleShopComponent implements OnInit {
   }
 
   checkout(): void {
-    // Implement checkout logic
-    console.log('Proceeding to checkout', this.cartItems);
+    if (this.cartItems.length === 0) {
+      this.toastr.warning('Your cart is empty');
+      return;
+    }
+
+    // Show customer selection dialog
+    Swal.fire({
+      title: 'Select Customer',
+      html: `
+        <div class="customer-selection">
+          <p>Please select how you want to proceed:</p>
+          <div class="d-grid gap-2">
+            <button id="selectExisting" class="btn btn-primary">Select Existing Customer</button>
+            <button id="createNew" class="btn btn-secondary">Create New Customer</button>
+          </div>
+        </div>
+      `,
+      showConfirmButton: false,
+      showCloseButton: true,
+      allowOutsideClick: true
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.close) {
+        return;
+      }
+    });
+
+    // Handle existing customer selection
+    document.getElementById('selectExisting')?.addEventListener('click', () => {
+      Swal.close();
+      this.router.navigate(['/customers'], { 
+        queryParams: { 
+          returnUrl: '/payment',
+          cartItems: JSON.stringify(this.cartItems)
+        }
+      });
+    });
+
+    // Handle new customer creation
+    document.getElementById('createNew')?.addEventListener('click', () => {
+      Swal.close();
+      this.router.navigate(['/customers/new'], { 
+        queryParams: { 
+          returnUrl: '/payment',
+          cartItems: JSON.stringify(this.cartItems)
+        }
+      });
+    });
+  }
+
+  removeFromCart(item: any): void {
+    this.cartService.removeItem(item);
+    this.cartItems = this.cartService.getItems();
+    this.toastr.success('Item removed from cart');
   }
 }

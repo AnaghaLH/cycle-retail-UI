@@ -35,25 +35,28 @@
         <tbody>
           <tr *ngFor="let customer of customers">
             <td>
-              <a [routerLink]="['/customers', customer.customerId]">
+              <a [routerLink]="['/customers', customer.customerId]" *ngIf="!returnUrl">
                 {{ customer.firstName }} {{ customer.lastName }}
               </a>
+              <span *ngIf="returnUrl">
+                {{ customer.firstName }} {{ customer.lastName }}
+              </span>
             </td>
             <td>{{ customer.email }}</td>
             <td>{{ customer.phone }}</td>
             <td>{{ customer.firstName}}</td>
             <td>{{ customer.createdAt ? (customer.createdAt | date:'mediumDate') : 'N/A' }}</td>
-
             <td>
-              <div class="btn-group btn-group-sm">
-                <a [routerLink]="['/customers', customer.customerId]" class="btn btn-outline-primary">
-                  <i class="fa fa-eye"></i>
-                </a>
-                <a [routerLink]="['/customers', customer.customerId, 'edit']" class="btn btn-outline-secondary">
-                  <i class="fa fa-edit"></i>
-                </a>
-                <button (click)="deleteCustomer(customer.customerId)" class="btn btn-outline-danger">
-                  <i class="fa fa-trash"></i>
+              <div class="btn-group" role="group">
+                <button *ngIf="returnUrl" 
+                        class="btn btn-primary btn-sm" 
+                        (click)="selectCustomer(customer)">
+                  Select
+                </button>
+                <button *ngIf="!returnUrl" 
+                        class="btn btn-danger btn-sm" 
+                        (click)="deleteCustomer(customer.customerId)">
+                  Delete
                 </button>
               </div>
             </td>

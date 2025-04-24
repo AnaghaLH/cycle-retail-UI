@@ -28,40 +28,45 @@ export class CustomerDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      const id = Number(params.get('id'));
-      console.log('Route param ID:', id);
-  
-      if (!id || isNaN(id)) {
-        this.toastr.error('Invalid customer ID');
+      const id = params.get('id');
+      if (!id) {
         this.router.navigate(['/customers']);
         return;
       }
-    
-    this.loadCustomer(id);
-    this.loadCustomerOrders(id);
-  });
-}
+
+      const customerId = Number(id);
+      if (isNaN(customerId)) {
+        this.router.navigate(['/customers']);
+        return;
+      }
+
+      this.loadCustomer(customerId);
+      this.loadCustomerOrders(customerId);
+    });
+  }
 
   loadCustomer(id: number): void {
     this.customerService.getCustomer(id).subscribe({
       next: (customer) => {
-        console.log('Customer fetched from API:', customer); 
         this.customer = customer;
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading customer:', err); 
-        this.toastr.error('Failed to load customer details');
+        console.error('Error loading customer:', err);
         this.router.navigate(['/customers']);
       }
     });
   }
 
-  
-
   loadCustomerOrders(customerId: number): void {
-    this.orderService.getCustomerOrders(customerId).subscribe(orders => {
-      this.orders = orders;
+    this.orderService.getCustomerOrders(customerId).subscribe({
+      next: (orders) => {
+        this.orders = orders;
+      },
+      error: (err) => {
+        console.error('Error loading customer orders:', err);
+        
+      }
     });
   }
 

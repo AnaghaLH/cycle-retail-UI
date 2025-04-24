@@ -18,6 +18,9 @@ import { PaymentFormComponent } from './components/payment-form/payment-form.com
 import { CycleDetailComponent } from './components/cycle-detail/cycle-detail.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { CycleShopComponent } from './components/cycle-shop/cycle-shop.component';
+import { CreateUserModalComponent } from './components/create-user-modal/create-user-modal.component';
+import { ReportsComponent } from './components/reports/reports.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +29,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: '', component: DashboardComponent },
+      {path:'profile', component:ProfileComponent, canActivate:[AuthGuard]},  
       { path: 'cycles', component: CyclesComponent },
       { path: 'orders', component: OrdersComponent },
       { path: 'customers', component: CustomersComponent },
@@ -45,6 +49,8 @@ const routes: Routes = [
       { path: 'cycles/:id', component:CycleDetailComponent, canActivate:[AuthGuard],data:{mode:'view'} },
       {path:'cycle-shop',component:CycleShopComponent},
       {path:'users',component:UsersComponent,canActivate:[AuthGuard]},
+      {path:'reports' ,component:ReportsComponent},
+      {path: 'users/new', component:CreateUserModalComponent, canActivate: [AuthGuard, AdminGuard]},
 
 
             ]

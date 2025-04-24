@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, } from '@angular/forms';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-cycles',
   templateUrl: './cycles.component.html',
@@ -198,16 +199,26 @@ timestamp = Date.now();
   }
 
   deleteCycle(id: number): void {
-    if (!confirm('Are you sure you want to delete this cycle?')) return;
-
-    this.cycleService.deleteCycle(id).subscribe({
-      next: () => {
-        
-        this.toastr.success('Cycle deleted successfully');
-        this.loadCycles();
-      },
-      error: () => {
-        this.toastr.error('Failed to delete cycle');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This cycle will be permanently deleted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cycleService.deleteCycle(id).subscribe({
+          next: () => {
+            this.toastr.success('Cycle deleted successfully');
+            this.loadCycles();
+          },
+          error: () => {
+            this.toastr.error('Failed to delete cycle');
+          }
+        });
       }
     });
   }

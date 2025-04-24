@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { User } from '../models/user.model';
+import { CreateUserResponse } from '../models/userDetails';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 @Injectable({
@@ -29,9 +30,19 @@ export class UserService {
     });
   }
 
-  deleteUser(userId: number) {
+  deleteUser(userId: number): Observable<any>  {
     return this.http.delete(`${this.apiUrl}/delete/${userId}`,{
       headers: this.getAuthHeaders()
     });
   }
+
+  createUser(userData: any): Observable<CreateUserResponse> {
+    return this.http.post<CreateUserResponse>(`${this.apiUrl}/create`, userData,{
+      headers: this.getAuthHeaders()
+    });
+  }
+
+
+
+
 }

@@ -1,31 +1,133 @@
-<div class="card p-4 shadow-sm">
-    <h4 class="mb-3">My Profile</h4>
-  
-    <div class="row">
-      <div class="col-md-4">
-        <img src="assets/profile-placeholder.png" class="img-thumbnail" alt="Profile" width="150">
-        <button class="btn btn-sm btn-outline-secondary mt-2">Change Photo</button>
-      </div>
-      
-      <div class="col-md-8">
+<div class="container mt-4">
+  <div class="row">
+    <!-- Profile Information -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title">Profile Information</h4>
+          <!-- <img src="assets/profile-placeholder.png" class="img-thumbnail mb-3" alt="Profile" width="150"> -->
+          
+          <!-- View Mode -->
+          <div class="mb-3" *ngIf="!isEditing && !isChangingPassword">
+            <p><strong>Username:</strong> {{user?.username }}</p>
+            <p><strong>Email:</strong> {{ user?.email }}</p>
+            <p><strong>Role:</strong> {{ user?.role }}</p>
 
-        <p><strong>Full Name:</strong> {{user?.username }}</p>
-        <p><strong>Email:</strong> {{ user?.email }}</p>
-        <p><strong>Role:</strong> {{ user?.role }}</p>
-  
-        <button class="btn btn-primary btn-sm me-2" (click)="editProfile()">Edit Info</button>
-        <button class="btn btn-secondary btn-sm" (click)="changePassword()">Change Password</button>
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" (click)="editProfile()">Edit Profile</button>
+              <button class="btn btn-secondary" (click)="changePassword()">Change Password</button>
+            </div>
+          </div>
+
+          <!-- Edit Profile Form -->
+          <form [formGroup]="editForm" *ngIf="isEditing" (ngSubmit)="saveProfile()">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" class="form-control" formControlName="username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Role</label>
+              <input type="text" class="form-control" formControlName="role">
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">Save Changes</button>
+              <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            </div>
+          </form>
+
+          <!-- Change Password Form -->
+          <form [formGroup]="passwordForm" *ngIf="isChangingPassword" (ngSubmit)="savePassword()">
+            <div class="mb-3">
+              <label class="form-label">Current Password</label>
+              <input type="password" class="form-control" formControlName="currentPassword">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" formControlName="newPassword">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" formControlName="confirmPassword">
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">Change Password</button>
+              <button type="button" class="btn btn-secondary" (click)="cancelPasswordChange()">Cancel</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  
-    <hr>
-  
-    <h5>Order History</h5>
-    <ul class="list-group">
-      <li *ngFor="let order of orders" class="list-group-item d-flex justify-content-between align-items-center">
-        Order #{{ order.id }} - {{ order.date }}
-        <span>{{ order.totalAmount | currency }}</span>
-      </li>
-    </ul>
+
+    <!-- Role-specific Features -->
+    <div class="col-md-8">
+      <!-- Admin Features -->
+      <div class="card shadow-sm mb-4" *ngIf="isAdmin">
+        <div class="card-body">
+          <h4 class="card-title">Admin Controls</h4>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fa fa-users fa-2x mb-2"></i>
+                  <h5>User Management</h5>
+                  <button class="btn btn-outline-primary" (click)="manageUsers()">Manage Users</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fa fa-chart-bar fa-2x mb-2"></i>
+                  <h5>Reports</h5>
+                  <button class="btn btn-outline-primary" (click)="viewReports()">View Reports</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fa fa-box fa-2x mb-2"></i>
+                  <h5>Inventory</h5>
+                  <button class="btn btn-outline-primary" (click)="manageInventory()">Manage Inventory</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order History -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title">Order History</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of orders">
+                  <td>#{{ order.orderId }}</td>
+                  <td>{{ order.orderDate | date }}</td>
+                  <td><span class="badge" [ngClass]="{
+                    'bg-warning': order.status === 'Pending',
+                    'bg-info': order.status === 'Processing',
+                    'bg-success': order.status === 'Delivered',
+                    'bg-danger': order.status === 'Cancelled'
+                  }">{{ order.status }}</span></td>
+                  <td>{{ order.totalAmount | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
   

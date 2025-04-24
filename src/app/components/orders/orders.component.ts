@@ -3,6 +3,7 @@ import { OrderService } from '../../services/order.service';
 import { Order } from '../../models/order.model';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -22,7 +23,8 @@ export class OrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     public authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {

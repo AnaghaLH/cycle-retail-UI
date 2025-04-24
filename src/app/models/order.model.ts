@@ -1,4 +1,5 @@
 export interface Order {
+  date: string | number | Date;
   orderId: number;
   customerId: number;
   customerName: string; // ✅ add this to match backend

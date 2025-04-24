@@ -2,8 +2,8 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">User Management</h5>
-      <div class="col-md-4">
-        <div class="input-group">
+      <div class="d-flex align-items-center gap-2">
+        <div class="input-group input-group-sm">
           <span class="input-group-text">
             <i class="fa fa-search"></i>
           </span>
@@ -14,6 +14,13 @@
                  [(ngModel)]="searchTerm"
                  (input)="onSearchChange($event)">
         </div>
+        <button
+          *ngIf="authService.isAdmin()"
+          class="btn btn-primary btn-sm"
+          routerLink="/users/new"
+        >
+          <i class="fa fa-plus me-1"></i> Create New User
+        </button>
       </div>
     </div>
     <div class="card-body">
@@ -92,6 +99,7 @@
           </tbody>
         </table>
     </div>
+
         <div *ngIf="filteredUsers.length === 0" class="text-center py-3">
             <p>No users found matching your search criteria</p>
             <button class="btn btn-link" (click)="searchTerm = ''; clearSearch()">

@@ -4,6 +4,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
+import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
@@ -21,7 +24,8 @@ export class UsersComponent implements OnInit {
   constructor(
     private userService: UserService,
     private toastr: ToastrService,
-    public authService: AuthService
+    public authService: AuthService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -32,10 +36,18 @@ export class UsersComponent implements OnInit {
     ).subscribe(searchTerm => {
       this.applySearchFilter(searchTerm);
     });
+
+    // Subscribe to route events to handle user creation
+    this.route.queryParams.subscribe(params => {
+      if (params['userCreated'] === 'true') {
+        this.loadUsers(); // Reload users when a new user is created
+      }
+    });
   }
+
   loadUsers(): void {
     this.isLoading = true;
-    this.userService.getAllUsers('').subscribe({ // default searchTerm as empty
+    this.userService.getAllUsers('').subscribe({ 
       next: (users) => {
         this.users = users;
         this.filteredUsers = [...users];
@@ -56,13 +68,13 @@ export class UsersComponent implements OnInit {
   }
 
   applySearchFilter(searchTerm: string): void {
-  const term = searchTerm.toLowerCase();
-  this.filteredUsers = this.users.filter(user => 
-    user.username?.toLowerCase().includes(term) ||
-    user.email?.toLowerCase().includes(term) ||
-    user.role?.toLowerCase().includes(term)
-  );
-}
+    const term = searchTerm.toLowerCase();
+    this.filteredUsers = this.users.filter(user => 
+      user.username?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.role?.toLowerCase().includes(term)
+    );
+  }
 
   startEdit(user: any): void {
     this.editingUserId = user.userId;
@@ -89,21 +101,45 @@ export class UsersComponent implements OnInit {
   }
 
   deleteUser(userId: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
-      this.userService.deleteUser(userId).subscribe({
-        next: () => {
-          this.toastr.success('User deleted successfully');
-          this.loadUsers();
-        },
-        error: (err) => {
-          this.toastr.error('Failed to delete user');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This user will be permanently deleted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteUser(userId).subscribe({
+          next: () => {
+            this.toastr.success('User deleted successfully');
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastr.error('Failed to delete user');
+          }
+        });
+      }
+    });
   }
+  
+
   clearSearch(): void {
     this.searchTerm = '';
     this.applySearchFilter('');
+  }
+
+  onCreateUser(userData: any) {
+    this.userService.createUser(userData).subscribe({
+      next: (response) => {
+        this.toastr.success(response.message);
+        this.users = [...this.users, response.user];
+      },
+      error: (err) => {
+        this.toastr.error(err.error.message || 'Failed to create user');
+      }
+    });
   }
   
 }

@@ -1,39 +1,144 @@
-<div class="payment-form-container">
-  <h2>Make a Payment</h2>
-  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="orderId">Order ID:</label>
-      <input id="orderId" formControlName="orderId" type="number">
+<div class="payment-container">
+  <div class="payment-card">
+    <div class="payment-header">
+      <h2>Checkout</h2>
+      <p class="subtitle">Complete your purchase</p>
     </div>
 
-    <div class="form-group">
-      <label for="amount">Amount:</label>
-      <input id="amount" formControlName="amount" type="number">
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div class="cart-items">
+        <div *ngFor="let item of cartItems" class="cart-item">
+          <div class="item-details">
+            <h4>{{ item.modelName }}</h4>
+            <p>Quantity: {{ item.quantity }}</p>
+          </div>
+          <div class="item-price">
+            ${{ item.price * item.quantity }}
+          </div>
+        </div>
+      </div>
+      <div class="total-amount">
+        <span>Total Amount:</span>
+        <span>${{ totalAmount }}</span>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="paymentMethod">Payment Method:</label>
-      <select id="paymentMethod" formControlName="paymentMethod">
-        <option value="Cash">Cash</option>
-        <option value="Card">Card</option>
-        <option value="UPI">UPI</option>
-      </select>
-    </div>
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="payment-form">
+      <div class="form-section">
+        <h3>Customer Information</h3>
+        <div class="form-group">
+          <label for="customerName">Full Name</label>
+          <input 
+            type="text" 
+            id="customerName" 
+            formControlName="customerName"
+            [ngClass]="{'is-invalid': paymentForm.get('customerName')?.invalid && paymentForm.get('customerName')?.touched}"
+          >
+          <div class="error-message" *ngIf="paymentForm.get('customerName')?.invalid && paymentForm.get('customerName')?.touched">
+            {{ getErrorMessage('customerName') }}
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label for="transactionId">Transaction ID:</label>
-      <input id="transactionId" formControlName="transactionId" type="text">
-    </div>
+        <div class="form-group">
+          <label for="customerEmail">Email</label>
+          <input 
+            type="email" 
+            id="customerEmail" 
+            formControlName="customerEmail"
+            [ngClass]="{'is-invalid': paymentForm.get('customerEmail')?.invalid && paymentForm.get('customerEmail')?.touched}"
+          >
+          <div class="error-message" *ngIf="paymentForm.get('customerEmail')?.invalid && paymentForm.get('customerEmail')?.touched">
+            {{ getErrorMessage('customerEmail') }}
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label for="status">Status:</label>
-      <select id="status" formControlName="status">
-        <option value="Completed">Completed</option>
-        <option value="Pending">Pending</option>
-        <option value="Failed">Failed</option>
-      </select>
-    </div>
+        <div class="form-group">
+          <label for="customerPhone">Phone Number</label>
+          <input 
+            type="tel" 
+            id="customerPhone" 
+            formControlName="customerPhone"
+            [ngClass]="{'is-invalid': paymentForm.get('customerPhone')?.invalid && paymentForm.get('customerPhone')?.touched}"
+          >
+          <div class="error-message" *ngIf="paymentForm.get('customerPhone')?.invalid && paymentForm.get('customerPhone')?.touched">
+            {{ getErrorMessage('customerPhone') }}
+          </div>
+        </div>
 
-    <button type="submit">Submit Payment</button>
-  </form>
+        <div class="form-group">
+          <label for="shippingAddress">Shipping Address</label>
+          <textarea 
+            id="shippingAddress" 
+            formControlName="shippingAddress"
+            [ngClass]="{'is-invalid': paymentForm.get('shippingAddress')?.invalid && paymentForm.get('shippingAddress')?.touched}"
+          ></textarea>
+          <div class="error-message" *ngIf="paymentForm.get('shippingAddress')?.invalid && paymentForm.get('shippingAddress')?.touched">
+            {{ getErrorMessage('shippingAddress') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Payment Information</h3>
+        <div class="form-group">
+          <label for="paymentMethod">Payment Method</label>
+          <select 
+            id="paymentMethod" 
+            formControlName="paymentMethod"
+            [ngClass]="{'is-invalid': paymentForm.get('paymentMethod')?.invalid && paymentForm.get('paymentMethod')?.touched}"
+          >
+            <option value="Card">Credit/Debit Card</option>
+            <option value="UPI">UPI</option>
+            <option value="Cash">Cash on Delivery</option>
+          </select>
+          <div class="error-message" *ngIf="paymentForm.get('paymentMethod')?.invalid && paymentForm.get('paymentMethod')?.touched">
+            {{ getErrorMessage('paymentMethod') }}
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="paymentForm.get('paymentMethod')?.value === 'Card'">
+          <label for="cardNumber">Card Number</label>
+          <input 
+            type="text" 
+            id="cardNumber" 
+            placeholder="1234 5678 9012 3456"
+            [ngClass]="{'is-invalid': paymentForm.get('cardNumber')?.invalid && paymentForm.get('cardNumber')?.touched}"
+          >
+        </div>
+
+        <div class="form-row" *ngIf="paymentForm.get('paymentMethod')?.value === 'Card'">
+          <div class="form-group">
+            <label for="expiryDate">Expiry Date</label>
+            <input 
+              type="text" 
+              id="expiryDate" 
+              placeholder="MM/YY"
+              [ngClass]="{'is-invalid': paymentForm.get('expiryDate')?.invalid && paymentForm.get('expiryDate')?.touched}"
+            >
+          </div>
+          <div class="form-group">
+            <label for="cvv">CVV</label>
+            <input 
+              type="text" 
+              id="cvv" 
+              placeholder="123"
+              [ngClass]="{'is-invalid': paymentForm.get('cvv')?.invalid && paymentForm.get('cvv')?.touched}"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="submit-button"
+          [disabled]="paymentForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Complete Payment</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

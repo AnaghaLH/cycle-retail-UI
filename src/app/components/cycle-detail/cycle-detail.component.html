@@ -10,7 +10,7 @@
     <div *ngIf="cycle" class="card detail-card">
       <div class="card-header">
         <button class="btn btn-back" (click)="backToList()">
-          <i class="fas fa-arrow-left"></i> Back to Inventory
+          <i class="fa fa-arrow-left"></i> Back to Inventory
         </button>
         <h3 class="text-center">{{ cycle.modelName }}</h3>
       </div>
@@ -64,13 +64,13 @@
               </div>
   
               <!-- Payment Button -->
-              <div class="action-buttons">
+              <!-- <div class="action-buttons">
                 <button class="btn btn-rent" 
                         (click)="proceedToPayment()"
                         [disabled]="cycle.stockQuantity <= 0">
-                  <i class="fas fa-shopping-cart me-2"></i> Rent Now
+                  <i class="fa fa-shopping-cart me-2"></i> Rent Now
                 </button>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>

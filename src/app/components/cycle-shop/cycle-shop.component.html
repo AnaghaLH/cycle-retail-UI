@@ -50,7 +50,7 @@
           <!-- Cycle Card -->
           <div class="col-md-4 mb-4" *ngFor="let cycle of filteredCycles">
             <div class="card cycle-card">
-              <img [src]="'assets/cycle1.jpg'" class="card-img-top" [alt]="cycle.modelName">
+              <img [src]="cycle.imageUrl || 'assets/cycle1.jpg'" class="card-img-top" [alt]="cycle.modelName">
               <div class="card-body">
                 <h5 class="card-title">{{ cycle.modelName }}</h5>
                 <p class="card-text"><b>Cycle Type: </b>{{ cycle.type.typeName }}</p>
@@ -80,7 +80,7 @@
     <!-- cycle-shop.component.html -->
 <div class="mini-cart-body">
     <div *ngFor="let item of cartItems" class="cart-item">
-        <img [src]=" 'assets/cycle1.jpg'"  [alt]="item.modelName"
+        <img [src]="item.imageUrl || 'assets/cycle1.jpg'" [alt]="item.modelName"
         class="item-image">
       <div class="item-details">
         <h6>{{ item.modelName }}</h6>

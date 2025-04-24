@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { ToastrService } from 'ngx-toastr';
@@ -42,14 +42,14 @@ export class AuthService {
         const decodedToken = this.jwtHelper.decodeToken(token);
         
         const user = {
-          userId:decodedToken.nameid,
+          userId: decodedToken.nameid,
           username: decodedToken.unique_name,
+          email: decodedToken.email,
           role: decodedToken.role,
           token: token
         };
 
         localStorage.setItem('currentUser', JSON.stringify(user));
-        //localStorage.setItem('access_token', response.token);
         this.currentUserSubject.next(user);
         
         return user;
@@ -82,4 +82,47 @@ export class AuthService {
     const user = this.currentUserValue;
     return user && user.role === 'Employee';
   }
+  changePassword(currentPassword: string, newPassword: string, confirmPassword: string) {
+    const username = this.currentUserValue?.username;
+    const requestBody = {
+      username,
+      currentPassword,
+      newPassword,
+      confirmPassword
+    };
+    
+    console.log('AuthService - Change Password Request Body:', JSON.stringify(requestBody, null, 2));
+    
+    return this.http.post('http://localhost:5081/api/Auth/change-password', requestBody, { responseType: 'text' }).pipe(
+      tap(response => console.log('AuthService - Change Password Response:', response)),
+      map(response => ({ success: true, message: response })),
+      catchError(error => {
+        console.error('AuthService - Change Password Error Details:', {
+          status: error.status,
+          statusText: error.statusText,
+          error: error.error,
+          message: error.message,
+          requestBody: requestBody
+        });
+        
+        // Handle specific error cases
+        if (error.status === 400) {
+          if (typeof error.error === 'string') {
+            this.toastr.error(error.error);
+          } else if (error.error && error.error.message) {
+            this.toastr.error(error.error.message);
+          } else {
+            this.toastr.error('An error occurred while changing the password');
+          }
+        } else if (error.status === 500) {
+          this.toastr.error('Server error occurred. Please try again later.');
+        } else {
+          this.toastr.error('An unexpected error occurred');
+        }
+        
+        throw error;
+      })
+    );
+  }
+  
 }

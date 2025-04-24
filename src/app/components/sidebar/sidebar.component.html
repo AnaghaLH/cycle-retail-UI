@@ -51,14 +51,14 @@
         
         <li class="nav-item" *ngIf="authService.isAdmin()">
           <a class="nav-link" routerLink="/users" routerLinkActive="active">
-            <i class="fa fa-user-cog me-2"></i>
+            <i class="fa fa-cog"></i>
             <span *ngIf="!collapsed">User Management</span>
           </a>
         </li>
         
         <li class="nav-item">
           <a class="nav-link" routerLink="/reports" routerLinkActive="active">
-            <i class="fa fa-chart-bar me-2"></i>
+            <i class="fa fa-file"></i>
             <span *ngIf="!collapsed">Reports</span>
           </a>
         </li>

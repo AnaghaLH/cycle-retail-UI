@@ -78,4 +78,16 @@ uploadCycleImage(cycleId: number, file: File): Observable<any> {
   formData.append('file', file);
   return this.http.post(`${this.apiUrl}/cycles/${cycleId}/upload-image`, formData);
 }
+getInventoryReport(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/report/inventory`, {
+    headers: this.getAuthHeaders()
+  });
+}
+
+getPopularCycles(startDate: string, endDate: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/report/popular`, {
+    params: { startDate, endDate },
+    headers: this.getAuthHeaders()
+  });
+}
 }
