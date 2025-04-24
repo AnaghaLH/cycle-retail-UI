@@ -140,6 +140,7 @@ export class UsersComponent implements OnInit {
         this.toastr.error(err.error.message || 'Failed to create user');
       }
     });
+    console.log("ji");
   }
   
 }
