@@ -1,126 +1,146 @@
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <i class="fa fa-bicycle me-2 "></i>
       <h5 class="mb-0">Cycle Inventory</h5>
-      <div>
-        <button class="btn btn-primary btn-sm" routerLink="/cycles/new">
-          <i class="fa fa-plus me-1"></i> Add New Cycle
-        </button>
-      </div>
     </div>
-    <div class="card-body">
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <!-- <input type="text" class="form-control form-control-sm" placeholder="Search..." 
-                 [(ngModel)]="searchTerm" (keyup)="applyFilters()"> -->
-          <input type="text" [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Search cycles...">
-
-        </div>
-        <div class="col-md-3">
-          <select class="form-select form-select-sm" [(ngModel)]="brandFilter" (change)="applyFilters()">
-            <option value="">All Brands</option>
-            <option *ngFor="let brand of brands" [value]="brand.brandId">{{ brand.brandName }}</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select class="form-select form-select-sm" [(ngModel)]="typeFilter" (change)="applyFilters()">
-            <option value="">All Types</option>
-            <option *ngFor="let type of types" [value]="type.typeId">{{ type.typeName }}</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select class="form-select form-select-sm" [(ngModel)]="sortField" (change)="applyFilters()">
-            <option value="modelName">Sort by Name</option>
-            <option value="price">Sort by Price</option>
-            <option value="stockQuantity">Sort by Stock</option>
-          </select>
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Model</th>
-              <th>Brand</th>
-              <th>Type</th>
-              <th class="text-end">Price</th>
-              <th class="text-end">Stock</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let cycle of pagedCycles">
-              
-              <td>
-                <!-- <img *ngIf="cycle.imageUrl; else defaultImage" 
-                     [src]="getImageUrl(cycle.imageUrl)" 
-                     #fileInput
-                     alt="{{ cycle.modelName }}" 
-                     width="60" 
-                     height="40" 
-                     class="rounded shadow-sm cursor-pointer"
-                     (click)="navigateToDetail(cycle.cycleId)" />
-                
-                <ng-template #defaultImage>
-                  <img src="assets/cycle1.jpg" 
-                       alt="{{ cycle.modelName }}" 
-                       width="60" 
-                       height="40" 
-                       class="rounded shadow-sm cursor-pointer"
-                       (click)="navigateToDetail(cycle.cycleId)" />
-                </ng-template> -->
-                <img *ngIf="cycle.imageUrl" [src]="cycle.imageUrl" alt="Cycle Image" class="cycle-image" style="width: 100px; height: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);" />
-              </td>
-              <td>
-                <a [routerLink]="['/cycles', cycle.cycleId]" class="text-decoration-none">
-                  {{ cycle.modelName }}
-                </a>
-                <span *ngIf="cycle.stockQuantity <= 5" class="badge bg-warning ms-2">Low Stock</span>
-              </td>
-              <td>{{ cycle.brand.brandName }}</td>
-              <td>{{ cycle.type.typeName }}</td>
-              <td class="text-end">{{ cycle.price | currency }}</td>
-              <td class="text-end">
-                <span [ngClass]="{
-                  'text-danger': cycle.stockQuantity <= 2,
-                  'text-warning': cycle.stockQuantity > 2 && cycle.stockQuantity <= 5
-                }">
-                  {{ cycle.stockQuantity }}
-                </span>
-              </td>
-              <td>
-                <div class="btn-group btn-group-sm">
-                  <a [routerLink]="['/cycles', cycle.cycleId, 'edit']" class="btn btn-outline-primary">
-                    <i class="fa fa-edit"></i>
-                  </a>
-                  <button (click)="deleteCycle(cycle.cycleId)" class="btn btn-outline-danger" [disabled]="!authService.isAdmin()">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                  
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-  
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <div>
-          {{calculateItemRange()}}
-        </div>
-        <nav>
-    <ul class="pagination pagination-sm mb-0">
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
-      </li>
-      <li *ngFor="let page of getPageNumbers()" class="page-item" [class.active]="page === currentPage">
-        <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
-      </li>
-      <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= totalItems">
-        <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
-      </li>
-    </ul>
-  </nav>
-      </div>
+    <div>
+      <button class="btn btn-primary" routerLink="/cycles/new">
+        <i class="fa fa-plus me-2"></i>Add New Cycle
+      </button>
     </div>
   </div>
+  
+  <div class="card-body">
+    <!-- Search and Filters Section -->
+    <div class="row mb-3 g-3">
+      <div class="col-md-3">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0">
+            <i class="fa fa-search text-muted"></i>
+          </span>
+          <input type="text" 
+                 class="form-control border-start-0" 
+                 [(ngModel)]="searchTerm" 
+                 (input)="applyFilters()" 
+                 placeholder="Search cycles...">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="brandFilter" (change)="applyFilters()">
+          <option value="">All Brands</option>
+          <option *ngFor="let brand of brands" [value]="brand.brandId">{{ brand.brandName }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="typeFilter" (change)="applyFilters()">
+          <option value="">All Types</option>
+          <option *ngFor="let type of types" [value]="type.typeId">{{ type.typeName }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="sortField" (change)="applyFilters()">
+          <option value="modelName">Sort by Name</option>
+          <option value="price">Sort by Price</option>
+          <option value="stockQuantity">Sort by Stock</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Model</th>
+            <th>Brand</th>
+            <th>Type</th>
+            <th class="text-end">Price</th>
+            <th class="text-end">Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cycle of pagedCycles">
+            <td>
+              <img *ngIf="cycle.imageUrl" 
+                   [src]="cycle.imageUrl" 
+                   [alt]="cycle.modelName" 
+                   class="cycle-image">
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <a [routerLink]="['/cycles', cycle.cycleId]" class="text-decoration-none fw-medium">
+                  {{ cycle.modelName }}
+                </a>
+                <span *ngIf="cycle.stockQuantity <= 5" 
+                      class="badge bg-warning mt-1" 
+                      style="width: fit-content;">
+                  Low Stock
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="text-muted">{{ cycle.brand.brandName }}</span>
+            </td>
+            <td>
+              <span class="text-muted">{{ cycle.type.typeName }}</span>
+            </td>
+            <td class="text-end fw-medium">{{ cycle.price | currency }}</td>
+            <td class="text-end">
+              <span [ngClass]="{
+                'text-danger': cycle.stockQuantity <= 2,
+                'text-warning': cycle.stockQuantity > 2 && cycle.stockQuantity <= 5,
+                'text-success': cycle.stockQuantity > 5
+              }">
+                {{ cycle.stockQuantity }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <a [routerLink]="['/cycles', cycle.cycleId, 'edit']" 
+                   class="btn btn-outline-primary" 
+                   title="Edit">
+                  <i class="fa fa-edit"></i>
+                </a>
+                <button (click)="deleteCycle(cycle.cycleId)" 
+                        class="btn btn-outline-danger" 
+                        [disabled]="!authService.isAdmin()"
+                        title="Delete">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Section -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div class="text-muted">
+        {{calculateItemRange()}}
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)">
+              <i class="fa fa-chevron-left"></i>
+            </a>
+          </li>
+          <li *ngFor="let page of getPageNumbers()" 
+              class="page-item" 
+              [class.active]="page === currentPage">
+            <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= totalItems">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)">
+              <i class="fa fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

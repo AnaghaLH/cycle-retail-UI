@@ -1,154 +1,237 @@
-<form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">Create New Order</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <!-- <div class="mb-3">
-              <label class="form-label">Customer</label>
-              <select class="form-select" formControlName="customerId" (change)="loadCustomerOrders()">
-                <option *ngFor="let customer of customers" [value]="customer.customerId">
-                  {{ customer.firstName }} {{ customer.lastName }}
-                </option>
-              </select>
-            </div> -->
-            <div class="mb-3">
-  <label class="form-label">Customer</label>
-  <input type="text" class="form-control" [(ngModel)]="customerSearch" 
-         [ngModelOptions]="{standalone: true}" (input)="searchCustomers()"
-         placeholder="Search customers...">
-  <div class="list-group mt-2" *ngIf="filteredCustomers.length > 0">
-    <button type="button" class="list-group-item list-group-item-action" 
-            *ngFor="let customer of filteredCustomers"
-            (click)="selectCustomer(customer)">
-      {{ customer.firstName }} {{ customer.lastName }}
-      <small class="text-muted d-block">{{ customer.email }}</small>
-    </button>
-  </div>
-</div>
-
+<form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="order-form">
+  <div class="card">
+    <div class="card-header d-flex align-items-center">
+      <i class="fa fa-shopping-cart me-2"></i>
+      <h5 class="mb-0">Create New Order</h5>
+    </div>
+    
+    <div class="card-body">
+      <!-- Customer Selection -->
+      <div class="form-group mb-4">
+        <label class="form-label">Customer</label>
+        <div class="customer-select">
+          <div class="input-group">
+            <input type="text" 
+                   class="form-control" 
+                   [(ngModel)]="customerSearch" 
+                   [ngModelOptions]="{standalone: true}" 
+                   (input)="searchCustomers()"
+                   (click)="showCustomerList = true"
+                   placeholder="Search or select customer...">
+            <button class="btn btn-outline-secondary" 
+                    type="button"
+                    (click)="showCustomerList = !showCustomerList">
+              <i class="fa" [ngClass]="showCustomerList ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
           </div>
-          <!-- <div class="col-md-6">
-            <div class="mb-3">
-              <label class="form-label">Employee</label>
-              <input class="form-control" [value]="currentUser?.username" readonly>
-            </div>
-          </div> -->
-        </div>
-  
-        <div class="mb-4">
-          <h6 class="mb-3">Order Items</h6>
           
-          <div class="table-responsive mb-3">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Cycle</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody formArrayName="items">
-                <tr *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i">
-                  <td>
-                    
-                    <select class="form-select form-select-sm" formControlName="cycleId" 
-                            (change)="onCycleChange(i)">
-                      <option value="">Select Cycle</option>
-                      <option *ngFor="let cycle of availableCycles" [value]="cycle.cycleId" 
-                              [disabled]="isCycleInOrder(cycle.cycleId, i)">
-                        {{ cycle.modelName }} ({{ cycle.brand.brandName}})
-                      </option>
-                    </select>
-                  </td>
-                  
-                  <td>
-                    <input type="number" class="form-control form-control-sm" formControlName="unitPrice" readonly>
-                  </td>
-                  <td>
-                    <input type="number" class="form-control form-control-sm" formControlName="quantity" min="1" 
-                           (change)="calculateTotal()">
-                  </td>
-                  <td>
-                    <input type="number" class="form-control form-control-sm" 
-                           [value]="item.value.quantity * item.value.unitPrice" readonly>
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeItem(i)">
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="3" class="text-end"><strong>Order Total:</strong></td>
-                  <td><strong>{{ orderTotal | currency }}</strong></td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
+          <div class="customer-list" *ngIf="showCustomerList">
+            <div class="customer-list-header">
+              <h6 class="mb-0">Select Customer</h6>
+              <button type="button" 
+                      class="btn-close" 
+                      (click)="showCustomerList = false">
+              </button>
+            </div>
+            <div class="customer-list-body">
+              <div *ngIf="filteredCustomers.length === 0" class="no-results">
+                No customers found
+              </div>
+              <button type="button" 
+                      class="customer-item" 
+                      *ngFor="let customer of filteredCustomers"
+                      (click)="selectCustomer(customer)">
+                <div class="customer-info">
+                  <span class="customer-name">{{ customer.firstName }} {{ customer.lastName }}</span>
+                  <small class="customer-email">{{ customer.email }}</small>
+                </div>
+              </button>
+            </div>
           </div>
-  
-          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addItem()">
-            <i class="fa fa-plus me-1"></i> Add Item
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="order-items-section">
+        <div class="section-header d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0">Order Items</h6>
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="addItem()">
+            <i class="fa fa-plus me-2"></i>Add Item
           </button>
         </div>
-      </div>
-      <div class="card-footer text-end">
-        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/orders">
-          Cancel
-        </button>
-        <button type="submit" class="btn btn-primary" [disabled]="orderForm.invalid || isSubmitting">
-          <span *ngIf="!isSubmitting">Create Order</span>
-          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        </button>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Cycle</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="items">
+              <tr *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i">
+                <td>
+                  <div class="cycle-select">
+                    <div class="input-group">
+                      <input type="text" 
+                             class="form-control" 
+                             [value]="getSelectedCycleName(i)"
+                             (click)="showCycleList(i)"
+                             readonly
+                             placeholder="Select cycle...">
+                      <button class="btn btn-outline-secondary" 
+                              type="button"
+                              (click)="toggleCycleList(i)">
+                        <i class="fa" [ngClass]="showCycleListIndex === i ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                      </button>
+                    </div>
+                    
+                    <div class="cycle-list" *ngIf="showCycleListIndex === i">
+                      <div class="cycle-list-header">
+                        <h6 class="mb-0">Select Cycle</h6>
+                        <button type="button" 
+                                class="btn-close" 
+                                (click)="showCycleListIndex = null">
+                        </button>
+                      </div>
+                      <div class="cycle-list-body">
+                        <div *ngIf="filteredCycles.length === 0" class="no-results">
+                          No cycles available
+                        </div>
+                        <button type="button" 
+                                class="cycle-item" 
+                                *ngFor="let cycle of filteredCycles"
+                                [disabled]="isCycleInOrder(cycle.cycleId, i)"
+                                (click)="selectCycle(cycle, i)">
+                          <div class="cycle-info">
+                            <span class="cycle-name">{{ cycle.modelName }}</span>
+                            <small class="cycle-details">
+                              {{ cycle.brand.brandName }} - {{ cycle.price | currency }}
+                            </small>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" 
+                           class="form-control" 
+                           formControlName="unitPrice" 
+                           readonly>
+                  </div>
+                </td>
+                <td>
+                  <input type="number" 
+                         class="form-control" 
+                         formControlName="quantity" 
+                         min="1" 
+                         (change)="calculateTotal()">
+                </td>
+                <td>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" 
+                           class="form-control" 
+                           [value]="item.value.quantity * item.value.unitPrice" 
+                           readonly>
+                  </div>
+                </td>
+                <td>
+                  <button type="button" 
+                          class="btn btn-outline-danger btn-sm" 
+                          (click)="removeItem(i)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-end">
+                  <strong>Order Total:</strong>
+                </td>
+                <td>
+                  <strong>{{ orderTotal | currency }}</strong>
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
     </div>
-  </form>
-  
-  <!-- Customer Order History -->
-  <div class="card mt-4" *ngIf="customerOrders.length > 0">
-    <div class="card-header">
-      <h6 class="mb-0">Customer's Previous Orders</h6>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Date</th>
-              <th>Items</th>
-              <th>Total</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let order of customerOrders">
-              <td>{{ order.orderId }}</td>
-              <td>{{ order.orderDate | date: 'shortDate' }}</td>
-          
-              <!-- ✅ Display total quantity across all items in the order -->
-              <td>{{ getTotalQuantity(order) }}</td>
-              <td>{{ order.totalAmount | currency }}</td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'bg-warning': order.status === 'Pending',
-                  'bg-info': order.status === 'Processing',
-                  'bg-primary': order.status === 'Shipped',
-                  'bg-success': order.status === 'Delivered',
-                  'bg-danger': order.status === 'Cancelled'
-                }">{{ order.status }}</span>
-              </td>
-            </tr>
-          </tbody>
-          
-        </table>
+
+    <div class="card-footer">
+      <div class="d-flex justify-content-end gap-2">
+        <button type="button" 
+                class="btn btn-outline-secondary" 
+                routerLink="/orders">
+          <i class="fa fa-times me-2"></i>Cancel
+        </button>
+        <button type="submit" 
+                class="btn btn-primary" 
+                [disabled]="orderForm.invalid || isSubmitting">
+          <span *ngIf="!isSubmitting">
+            <i class="fa fa-save me-2"></i>Create Order
+          </span>
+          <span *ngIf="isSubmitting" class="d-flex align-items-center">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Creating...
+          </span>
+        </button>
       </div>
     </div>
   </div>
+</form>
+
+<!-- Customer Order History -->
+<div class="card mt-4" *ngIf="customerOrders.length > 0">
+  <div class="card-header d-flex align-items-center">
+    <i class="fa fa-history me-2"></i>
+    <h6 class="mb-0">Customer's Previous Orders</h6>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of customerOrders">
+            <td>
+              <span class="order-id">#{{ order.orderId }}</span>
+            </td>
+            <td>
+              <span class="order-date">{{ order.orderDate | date:'mediumDate' }}</span>
+            </td>
+            <td>{{ getTotalQuantity(order) }}</td>
+            <td>
+              <span class="order-amount">{{ order.totalAmount | currency }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-warning': order.status === 'Pending',
+                'bg-info': order.status === 'Processing',
+                'bg-primary': order.status === 'Shipped',
+                'bg-success': order.status === 'Delivered',
+                'bg-danger': order.status === 'Cancelled'
+              }">{{ order.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

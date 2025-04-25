@@ -27,7 +27,10 @@ export class OrderFormComponent implements OnInit {
   customerOrders: Order[] = [];
   orderTotal = 0;
   customerSearch: string = '';
-filteredCustomers: Customer[] = [];
+  filteredCustomers: Customer[] = [];
+  showCustomerList = false;
+  showCycleListIndex: number | null = null;
+  filteredCycles: Cycle[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -113,10 +116,7 @@ filteredCustomers: Customer[] = [];
   loadCustomers(): void {
     this.customerService.getCustomers().subscribe(customers => {
       this.customers = customers;
-      if (customers.length > 0) {
-        this.orderForm.patchValue({ customerId: customers[0].customerId });
-        //this.loadCustomerOrders();
-      }
+      this.filteredCustomers = customers;
     });
   }
   
@@ -139,13 +139,16 @@ filteredCustomers: Customer[] = [];
   
       if (Array.isArray(cycles)) {
         this.availableCycles = cycles.filter(c => c.stockQuantity > 0);
+        this.filteredCycles = this.availableCycles;
       } else {
         console.warn('Unexpected response format:', cycles);
         this.availableCycles = [];
+        this.filteredCycles = [];
       }
     }, error => {
       console.error('Error fetching cycles:', error);
       this.availableCycles = [];
+      this.filteredCycles = [];
     });
   }
   
@@ -212,20 +215,25 @@ filteredCustomers: Customer[] = [];
       return total + (quantity * unitPrice);
     }, 0);
   }
-  searchCustomers() {
-  const query = this.customerSearch.toLowerCase();
-  this.filteredCustomers = this.customers.filter(c =>
-    `${c.firstName} ${c.lastName}`.toLowerCase().includes(query) ||
-    c.email.toLowerCase().includes(query)
-  );
-}
+  searchCustomers(): void {
+    if (!this.customerSearch) {
+      this.filteredCustomers = this.customers;
+      return;
+    }
 
-selectCustomer(customer: Customer) :void {
-  this.customerSearch = `${customer.firstName} ${customer.lastName}`;
-  this.filteredCustomers = [];
-  this.orderForm.get('customerId')?.setValue(customer.customerId);
-  this.loadCustomerOrders(); // Optional: trigger loading previous orders
-}
+    const searchTerm = this.customerSearch.toLowerCase();
+    this.filteredCustomers = this.customers.filter(customer => 
+      `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm) ||
+      customer.email.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  selectCustomer(customer: Customer): void {
+    this.customerSearch = `${customer.firstName} ${customer.lastName}`;
+    this.orderForm.patchValue({ customerId: customer.customerId });
+    this.showCustomerList = false;
+    this.loadCustomerOrders();
+  }
   
 
   // onSubmit(): void {
@@ -315,5 +323,28 @@ selectCustomer(customer: Customer) :void {
     console.log('Sending order to backend:', JSON.stringify(orderData, null, 2));
   }
   
-  
+  getSelectedCycleName(index: number): string {
+    const cycleId = this.orderItems.at(index).get('cycleId')?.value;
+    const cycle = this.availableCycles.find(c => c.cycleId === cycleId);
+    return cycle ? `${cycle.modelName} (${cycle.brand.brandName})` : '';
+  }
+
+  showCycleList(index: number): void {
+    this.showCycleListIndex = index;
+  }
+
+  toggleCycleList(index: number): void {
+    this.showCycleListIndex = this.showCycleListIndex === index ? null : index;
+  }
+
+  selectCycle(cycle: Cycle, index: number): void {
+    const itemGroup = this.orderItems.at(index) as FormGroup;
+    itemGroup.patchValue({
+      cycleId: cycle.cycleId,
+      unitPrice: cycle.price,
+      quantity: 1
+    });
+    this.showCycleListIndex = null;
+    this.calculateTotal();
+  }
 }
