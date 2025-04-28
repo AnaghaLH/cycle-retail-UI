@@ -4,7 +4,7 @@ import { Order } from '../../models/order.model';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.component.html',
@@ -91,18 +91,30 @@ export class OrdersComponent implements OnInit {
   }
 
   deleteOrder(orderId: number): void {
-    if (!confirm('Are you sure you want to delete this order?')) return;
-
-    this.orderService.deleteOrder(orderId).subscribe({
-      next: () => {
-        this.toastr.success('Order deleted successfully');
-        this.loadOrders();
-      },
-      error: () => {
-        this.toastr.error('Failed to delete order');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.orderService.deleteOrder(orderId).subscribe({
+          next: () => {
+            this.toastr.success('Order deleted successfully');
+            this.loadOrders();
+          },
+          error: () => {
+            this.toastr.error('Failed to delete order');
+          }
+        });
       }
     });
   }
+  
 
   getPageNumbers(): number[] {
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);

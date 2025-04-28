@@ -3,11 +3,14 @@ export interface Order {
   orderId: number;
   customerId: number;
   customerName: string; // ✅ add this to match backend
+  customerPhone?: string;
+  shippingAddress?: string;
   employeeId?: number;
   orderDate: string; // or Date if you're converting
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   totalAmount: number;
   totalQuantity: number;
+  
   items: {
     cycleId: number;
     cycleName: string;

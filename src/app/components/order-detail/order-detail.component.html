@@ -19,8 +19,8 @@
               <h6>Customer Information</h6>
               <p>
                 <strong>{{ order.customerName}}</strong><br>
-                <!-- {{ order.customer?.email }}<br>
-                {{ order.customer?.phone }} -->
+                📞 {{ order.customerPhone }}<br>
+                📦 {{ order.shippingAddress }}
               </p>
             </div>
             <div class="col-md-6">
@@ -78,11 +78,21 @@
         <div class="card-header">
           <h6 class="mb-0">Status History</h6>
         </div>
+        
         <div class="card-body">
           <ul class="list-group list-group-flush">
             <li class="list-group-item" *ngFor="let status of statusHistory">
               <div class="d-flex justify-content-between">
-                <span>{{ status.status }}</span>
+                <div>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': status.status === 'Pending',
+                    'bg-info': status.status === 'Processing',
+                    'bg-primary': status.status === 'Shipped',
+                    'bg-success': status.status === 'Delivered',
+                    'bg-danger': status.status === 'Cancelled'
+                  }">{{ status.status }}</span>
+                </div>
+                <!-- <span>{{ status.status }}</span> -->
                 <small class="text-muted">{{ status.date | date:'short' }}</small>
               </div>
             </li>

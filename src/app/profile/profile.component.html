@@ -1,129 +1,146 @@
-<div class="container mt-4">
-  <div class="row">
-    <!-- Profile Information -->
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h4 class="card-title">Profile Information</h4>
-          <!-- <img src="assets/profile-placeholder.png" class="img-thumbnail mb-3" alt="Profile" width="150"> -->
+<div class="profile-container">
+  <div class="profile-card">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-cover"></div>
+      <div class="profile-info">
+        <img src="assets/profile-placeholder.jpg" class="profile-avatar" alt="Profile">
+        <div class="profile-details">
+          <h1>{{ user?.username }}</h1>
+          <p>{{ user?.email }}</p>
           
-          <!-- View Mode -->
-          <div class="mb-3" *ngIf="!isEditing && !isChangingPassword">
-            <p><strong>Username:</strong> {{user?.username }}</p>
-            <p><strong>Email:</strong> {{ user?.email }}</p>
-            <p><strong>Role:</strong> {{ user?.role }}</p>
-
-            <div class="d-grid gap-2">
-              <button class="btn btn-primary" (click)="editProfile()">Edit Profile</button>
-              <button class="btn btn-secondary" (click)="changePassword()">Change Password</button>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <i class="fa fa-user"></i>
+              <span>{{ user?.role }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fa fa-shopping-cart"></i>
+              <span>{{ orders.length }} Orders</span>
             </div>
           </div>
-
-          <!-- Edit Profile Form -->
-          <form [formGroup]="editForm" *ngIf="isEditing" (ngSubmit)="saveProfile()">
-            <div class="mb-3">
-              <label class="form-label">Username</label>
-              <input type="text" class="form-control" formControlName="username">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Role</label>
-              <input type="text" class="form-control" formControlName="role">
-            </div>
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-success">Save Changes</button>
-              <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
-            </div>
-          </form>
-
-          <!-- Change Password Form -->
-          <form [formGroup]="passwordForm" *ngIf="isChangingPassword" (ngSubmit)="savePassword()">
-            <div class="mb-3">
-              <label class="form-label">Current Password</label>
-              <input type="password" class="form-control" formControlName="currentPassword">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">New Password</label>
-              <input type="password" class="form-control" formControlName="newPassword">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Confirm New Password</label>
-              <input type="password" class="form-control" formControlName="confirmPassword">
-            </div>
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-success">Change Password</button>
-              <button type="button" class="btn btn-secondary" (click)="cancelPasswordChange()">Cancel</button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
 
-    <!-- Role-specific Features -->
-    <div class="col-md-8">
-      <!-- Admin Features -->
-      <div class="card shadow-sm mb-4" *ngIf="isAdmin">
-        <div class="card-body">
-          <h4 class="card-title">Admin Controls</h4>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-body text-center">
-                  <i class="fa fa-users fa-2x mb-2"></i>
-                  <h5>User Management</h5>
-                  <button class="btn btn-outline-primary" (click)="manageUsers()">Manage Users</button>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-body text-center">
-                  <i class="fa fa-chart-bar fa-2x mb-2"></i>
-                  <h5>Reports</h5>
-                  <button class="btn btn-outline-primary" (click)="viewReports()">View Reports</button>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-body text-center">
-                  <i class="fa fa-box fa-2x mb-2"></i>
-                  <h5>Inventory</h5>
-                  <button class="btn btn-outline-primary" (click)="manageInventory()">Manage Inventory</button>
-                </div>
-              </div>
-            </div>
+    <!-- Profile Content -->
+    <div class="profile-content">
+      <!-- Profile Information Section -->
+      <div class="section">
+        <h2>Profile Information</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="label">Username</div>
+            <div class="value">{{ user?.username }}</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Email</div>
+            <div class="value">{{ user?.email }}</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Phone</div>
+            <div class="value">{{ user?.phone }}</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Role</div>
+            <div class="value">{{ user?.role }}</div>
+          </div>
+        </div>
+
+        <!-- View Mode -->
+        <div class="profile-actions" *ngIf="!isEditing && !isChangingPassword">
+          <button class="btn btn-primary" (click)="editProfile()">
+            <i class="fa fa-edit"></i> Edit Profile
+          </button>
+          <button class="btn btn-outline" (click)="changePassword()">
+            <i class="fa fa-key"></i> Change Password
+          </button>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <form class="profile-form" [formGroup]="editForm" *ngIf="isEditing" (ngSubmit)="saveProfile()">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" formControlName="username">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" formControlName="email">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-outline" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </form>
+
+        <!-- Change Password Form -->
+        <form class="profile-form" [formGroup]="passwordForm" *ngIf="isChangingPassword" (ngSubmit)="savePassword()">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" formControlName="currentPassword">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" formControlName="newPassword">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" class="form-control" formControlName="confirmPassword">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Change Password</button>
+            <button type="button" class="btn btn-outline" (click)="cancelPasswordChange()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Admin Features Section -->
+      <div class="section" *ngIf="isAdmin">
+        <h2>Admin Controls</h2>
+        <div class="info-grid">
+          <div class="info-item" (click)="manageUsers()">
+            <i class="fa fa-users fa-2x mb-2"></i>
+            <div class="label">User Management</div>
+            <div class="value">Manage system users</div>
+          </div>
+          <div class="info-item" (click)="viewReports()">
+            <i class="fa fa-chart-bar fa-2x mb-2"></i>
+            <div class="label">Reports</div>
+            <div class="value">View system reports</div>
+          </div>
+          <div class="info-item" (click)="manageInventory()">
+            <i class="fa fa-box fa-2x mb-2"></i>
+            <div class="label">Inventory</div>
+            <div class="value">Manage inventory</div>
           </div>
         </div>
       </div>
 
-      <!-- Order History -->
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h4 class="card-title">Order History</h4>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let order of orders">
-                  <td>#{{ order.orderId }}</td>
-                  <td>{{ order.orderDate | date }}</td>
-                  <td><span class="badge" [ngClass]="{
-                    'bg-warning': order.status === 'Pending',
-                    'bg-info': order.status === 'Processing',
-                    'bg-success': order.status === 'Delivered',
-                    'bg-danger': order.status === 'Cancelled'
-                  }">{{ order.status }}</span></td>
-                  <td>{{ order.totalAmount | currency }}</td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- Order History Section -->
+      <div class="section">
+        <h2>Order History</h2>
+        <div class="order-history-grid" [ngClass]="{'multi-column': orders.length > 5}">
+          <div class="order-column" *ngFor="let column of getOrderColumns()">
+            <div class="activity-timeline">
+              <div class="timeline-item" *ngFor="let order of column">
+                <div class="timeline-icon">
+                  <i class="fa fa-shopping-cart"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Order #{{ order.orderId }}</div>
+                  <div class="timeline-date">{{ order.orderDate | date }}</div>
+                  <div class="timeline-description">
+                    <span class="badge" [ngClass]="{
+                      'bg-warning': order.status === 'Pending',
+                      'bg-info': order.status === 'Processing',
+                      'bg-success': order.status === 'Delivered',
+                      'bg-danger': order.status === 'Cancelled'
+                    }">{{ order.status }}</span>
+                    <span class="ms-2">{{ order.totalAmount | currency }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
