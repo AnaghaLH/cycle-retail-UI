@@ -75,7 +75,11 @@ export function tokenGetter() {
     }),
     NzDatePickerModule,
 
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot(
+      {
+        timeOut: 1350,
+      }
+    ),
   ],
   providers: [ { provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]

@@ -18,6 +18,8 @@ export class CreateUserModalComponent implements OnInit {
   isVisible = true; // Set to true by default since we're using it as a route
   roles = ['Admin', 'Employee', 'Customer'];
   isLoading = false;
+  isSubmitting: boolean = false;
+
 
   userForm = this.fb.group({
     username: ['', Validators.required],

@@ -1,231 +1,345 @@
 /* reports.component.scss */
-.card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.reports-container {
+  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+  min-height: 100vh;
+  padding: 2rem;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #667eea 100%);
+  .card {
     border: none;
-    padding: 1.25rem;
-    color: black;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
 
-    h5, h6 {
-      font-weight: 600;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.1rem;
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      padding: 1.25rem;
+      color: white;
 
-      i {
-        font-size: 1.1rem;
+      h5, h6 {
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 2rem;
+
+        i {
+          font-size: 1.1rem;
+        }
       }
     }
+
+    .card-body {
+      padding: 1.5rem;
+    }
   }
 
-  .card-body {
-    padding: 1.5rem;
-  }
-}
-
-/* Date Range Picker Styling */
-nz-range-picker {
-  border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0.5rem;
-  background: #f8fafc;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #4a90e2;
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
   }
 
-  &:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-  }
-}
+  .reports-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
 
-/* Button Styling */
-.btn {
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 0.6rem 1.25rem;
-  
-  &-outline-secondary {
-    border: 1px solid #e2e8f0;
-    color: #4a5568;
-    background: #ffffff;
-    
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .report-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
     &:hover {
-      background: #f8fafc;
-      border-color: #cbd5e0;
-      color: #2d3748;
       transform: translateY(-2px);
-    }
-  }
-}
-
-/* Dropdown Menu Styling */
-.dropdown-menu {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem;
-
-  .dropdown-item {
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    color: #4a5568;
-
-    &:hover {
-      background: #f8fafc;
-      color: #2d3748;
-    }
-  }
-}
-
-/* Sales Summary Styling */
-.text-primary {
-  color: #667eea !important;
-}
-
-h3 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: #2d3748;
-}
-
-.text-muted {
-  color: #718096 !important;
-  font-size: 0.875rem;
-}
-
-/* Inventory Status Styling */
-.text-success {
-  color: #48bb78 !important;
-}
-
-.text-warning {
-  color: #ecc94b !important;
-}
-
-.text-danger {
-  color: #f56565 !important;
-}
-
-/* List Group Styling */
-.list-group {
-  border-radius: 8px;
-  overflow: hidden;
-
-  .list-group-item {
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-    background: #ffffff;
-    transition: all 0.2s ease;
-
-    &:last-child {
-      border-bottom: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    &:hover {
-      background: #f8fafc;
-    }
-
-    .badge {
-      padding: 0.5rem 0.75rem;
-      font-weight: 500;
-      border-radius: 6px;
-      background: #667eea;
-    }
-  }
-}
-
-/* Chart Container Styling */
-echarts {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 400px;
-}
-
-/* Loading Spinner */
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-  color: #667eea;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .card {
     .card-header {
-      padding: 1rem;
+      background: #f8fafc;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 1rem 1.25rem;
+
+      h6 {
+        color: #2d3748;
+        font-size: 1rem;
+      }
     }
 
     .card-body {
       padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
   }
 
-  h3 {
-    font-size: 1.5rem;
+  .chart-container {
+    height: 300px;
+    width: 100%;
+    position: relative;
+    flex: 1;
+    min-height: 0; // Fix for Firefox flexbox issue
+
+    ::ng-deep {
+      .echarts {
+        width: 100%;
+        height: 100%;
+      }
+
+      // Order Status Chart specific styles
+      .order-status-chart {
+        .echarts-legend {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 30%;
+          height: 100%;
+          overflow-y: auto;
+        }
+
+        .echarts-pie {
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 70%;
+          height: 100%;
+        }
+      }
+
+      // Revenue by Category Chart specific styles
+      .category-chart {
+        .echarts-legend {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 30%;
+          height: 100%;
+          overflow-y: auto;
+        }
+
+        .echarts-pie {
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 70%;
+          height: 100%;
+        }
+      }
+    }
   }
 
-  .list-group-item {
-    padding: 0.75rem;
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+
+    .summary-item {
+      text-align: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      .summary-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+
+        &.text-primary {
+          color: #667eea;
+        }
+      }
+
+      .summary-label {
+        color: #718096;
+        font-size: 0.875rem;
+      }
+    }
   }
 
-  echarts {
-    min-height: 300px;
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+
+    .inventory-item {
+      text-align: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      .inventory-value {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .inventory-label {
+        color: #718096;
+        font-size: 0.875rem;
+      }
+    }
   }
+
+  .top-cycles-list {
+    .cycle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background-color 0.3s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+
+      .cycle-info {
+        .cycle-name {
+          font-weight: 500;
+          color: #2d3748;
+        }
+
+        .cycle-brand {
+          font-size: 0.875rem;
+          color: #718096;
+        }
+      }
+
+      .cycle-sales {
+        .badge {
+          background: #667eea;
+          color: white;
+          padding: 0.5rem 0.75rem;
+          border-radius: 6px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Date Range Picker Styling
+  nz-range-picker {
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    background: white;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #667eea;
+    }
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+
+  // Button Styling
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.6rem 1.25rem;
+    
+    &-outline-secondary {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      background: transparent;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+    }
+  }
+
+  // Dropdown Menu Styling
+  .dropdown-menu {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+
+    .dropdown-item {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      color: #4a5568;
+
+      &:hover {
+        background: #f8fafc;
+        color: #2d3748;
+      }
+    }
+  }
+
+  // Colors
+  .text-primary { color: #667eea !important; }
+  .text-success { color: #48bb78 !important; }
+  .text-warning { color: #ecc94b !important; }
+  .text-danger { color: #f56565 !important; }
 }
 
-/* Grid Layout */
-.row {
-  margin: -0.75rem;
+// Responsive adjustments
+@media (max-width: 768px) {
+  .reports-container {
+    padding: 1rem;
 
-  > [class*="col-"] {
-    padding: 0.75rem;
+    .summary-grid,
+    .inventory-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+      height: 250px;
+
+      ::ng-deep {
+        .order-status-chart,
+        .category-chart {
+          .echarts-legend {
+            position: relative;
+            width: 100%;
+            height: auto;
+          }
+
+          .echarts-pie {
+            position: relative;
+            width: 100%;
+            height: 200px;
+          }
+        }
+      }
+    }
   }
-}
-
-/* Card Grid Layout */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card {
-  animation: fadeIn 0.3s ease-out;
 }

@@ -35,6 +35,7 @@
                      [(ngModel)]="priceRange" (input)="applyFilters()">
               <div class="price-range-value">$0 - ${{priceRange}}</div>
             </div>
+          
             
             <!-- Type Filter -->
             <div class="form-group mb-4">
@@ -68,6 +69,7 @@
                   <p class="cycle-type"><i class="fa fa-bicycle me-2"></i>{{ cycle.type.typeName }}</p>
                   <p class="cycle-brand"><i class="fa fa-tag me-2"></i>{{ cycle.brand.brandName }}</p>
                 </div>
+      
                 <div class="card-footer">
                   <div class="price-section">
                     <span class="price">${{ cycle.price }}</span>
@@ -88,6 +90,7 @@
   </div>
   
   <!-- Mini Cart Sidebar -->
+  <div class="card-body">
   <div class="mini-cart" [class.open]="cartOpen">
     <div class="mini-cart-header">
       <h5 class="mb-0">Your Cart ({{cartItems.length}})</h5>

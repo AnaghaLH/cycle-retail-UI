@@ -129,21 +129,43 @@ export class CycleShopComponent implements OnInit {
       return;
     }
 
-    // Show customer selection dialog
+    // Show enhanced customer selection dialog
     Swal.fire({
-      title: 'Select Customer',
+      title: '<strong>Select Customer</strong>',
       html: `
         <div class="customer-selection">
-          <p>Please select how you want to proceed:</p>
-          <div class="d-grid gap-2">
-            <button id="selectExisting" class="btn btn-primary">Select Existing Customer</button>
-            <button id="createNew" class="btn btn-secondary">Create New Customer</button>
+          <div class="selection-header">
+            <i class="fas fa-user-circle mb-3" style="font-size: 3rem; color: #667eea;"></i>
+            <h4 class="mb-3">How would you like to proceed?</h4>
+          </div>
+          <div class="selection-options">
+            <button id="selectExisting" class="selection-btn existing-btn">
+              <i class="fas fa-users me-2"></i>
+              <div class="btn-content">
+                <span class="btn-title">Select Existing Customer</span>
+                <span class="btn-subtitle">Choose from your existing customers</span>
+              </div>
+            </button>
+            <button id="createNew" class="selection-btn new-btn">
+              <i class="fas fa-user-plus me-2"></i>
+              <div class="btn-content">
+                <span class="btn-title">Create New Customer</span>
+                <span class="btn-subtitle">Add a new customer to your database</span>
+              </div>
+            </button>
           </div>
         </div>
       `,
       showConfirmButton: false,
       showCloseButton: true,
-      allowOutsideClick: true
+      allowOutsideClick: true,
+      customClass: {
+        popup: 'customer-selection-popup',
+        closeButton: 'customer-selection-close'
+      },
+      background: '#ffffff',
+      width: '500px',
+      padding: '2rem'
     }).then((result) => {
       if (result.dismiss === Swal.DismissReason.close) {
         return;

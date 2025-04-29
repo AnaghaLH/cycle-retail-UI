@@ -71,9 +71,9 @@
             </td>
             <td>
               <div class="d-flex flex-column">
-                <a [routerLink]="['/cycles', cycle.cycleId]" class="text-decoration-none fw-medium">
+                <span class="fw-medium">
                   {{ cycle.modelName }}
-                </a>
+                </span>
                 <span *ngIf="cycle.stockQuantity <= 5" 
                       class="badge bg-warning mt-1" 
                       style="width: fit-content;">
@@ -99,6 +99,11 @@
             </td>
             <td>
               <div class="btn-group">
+                <a [routerLink]="['/cycles', cycle.cycleId]" 
+                   class="btn btn-outline-primary" 
+                   title="View">
+                  <i class="fa fa-eye"></i>
+                </a>
                 <a [routerLink]="['/cycles', cycle.cycleId, 'edit']" 
                    class="btn btn-outline-primary" 
                    title="Edit">

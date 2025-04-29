@@ -21,8 +21,18 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
+      rememberMe: [false]
     });
+
+    // Check for saved credentials
+    const savedUsername = localStorage.getItem('rememberedUsername');
+    if (savedUsername) {
+      this.loginForm.patchValue({
+        username: savedUsername,
+        rememberMe: true
+      });
+    }
   }
 
   onSubmit() {
@@ -31,7 +41,14 @@ export class LoginComponent {
     }
 
     this.loading = true;
-    const { username, password } = this.loginForm.value;
+    const { username, password, rememberMe } = this.loginForm.value;
+
+    // Handle remember me functionality
+    if (rememberMe) {
+      localStorage.setItem('rememberedUsername', username);
+    } else {
+      localStorage.removeItem('rememberedUsername');
+    }
 
     this.authService.login(username, password).subscribe({
       next: () => {
@@ -43,5 +60,11 @@ export class LoginComponent {
         this.toastr.error('Invalid username or password');
       }
     });
+  }
+
+  onForgotPassword(event: Event) {
+    event.preventDefault();
+    // Implement forgot password logic here
+    this.toastr.info('Please contact your administrator to reset your password');
   }
 }
