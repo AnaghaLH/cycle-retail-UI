@@ -6,6 +6,7 @@ import { Customer } from '../../models/customer.model';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
 import { OrderService } from '../../services/order.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-customer-form',
@@ -18,6 +19,7 @@ export class CustomerFormComponent implements OnInit {
   customerId: number | null = null;
   returnUrl: string | null = null;
   cartItems: any[] = [];
+  existingCustomers: Customer[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -30,12 +32,15 @@ export class CustomerFormComponent implements OnInit {
   ) {
     this.customerForm = this.fb.group({
       customerId: [0],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.email]],
-      phone: [''],
-      address: ['']
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      address: ['', Validators.required]
     });
+
+    // Load existing customers for validation
+    this.loadExistingCustomers();
   }
 
   ngOnInit(): void {
@@ -54,6 +59,71 @@ export class CustomerFormComponent implements OnInit {
         this.loadCustomer(this.customerId);
       }
     });
+
+    // Add custom validators for email and phone
+    this.setupCustomValidators();
+  }
+
+  private loadExistingCustomers(): void {
+    this.customerService.getCustomers().subscribe({
+      next: (customers: Customer[]) => {
+        this.existingCustomers = customers;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error loading customers:', error);
+        this.toastr.error('Failed to load existing customers');
+      }
+    });
+  }
+
+  private setupCustomValidators(): void {
+    // Email duplicate validator
+    this.customerForm.get('email')?.setAsyncValidators([
+      (control) => {
+        return new Promise((resolve) => {
+          const email = control.value;
+          if (!email) {
+            resolve(null);
+            return;
+          }
+
+          const isDuplicate = this.existingCustomers.some(customer => 
+            customer.email.toLowerCase() === email.toLowerCase() && 
+            customer.customerId !== this.customerId
+          );
+
+          if (isDuplicate) {
+            resolve({ emailDuplicate: true });
+          } else {
+            resolve(null);
+          }
+        });
+      }
+    ]);
+
+    // Phone duplicate validator
+    this.customerForm.get('phone')?.setAsyncValidators([
+      (control) => {
+        return new Promise((resolve) => {
+          const phone = control.value;
+          if (!phone) {
+            resolve(null);
+            return;
+          }
+
+          const isDuplicate = this.existingCustomers.some(customer => 
+            customer.phone === phone && 
+            customer.customerId !== this.customerId
+          );
+
+          if (isDuplicate) {
+            resolve({ phoneDuplicate: true });
+          } else {
+            resolve(null);
+          }
+        });
+      }
+    ]);
   }
 
   loadCustomer(id: number): void {
@@ -69,7 +139,10 @@ export class CustomerFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.customerForm.invalid) return;
+    if (this.customerForm.invalid) {
+      this.validateAllFormFields();
+      return;
+    }
 
     this.isSubmitting = true;
     const customerData = this.customerForm.value;
@@ -117,5 +190,45 @@ export class CustomerFormComponent implements OnInit {
       }
     });
     console.log('Customer Payload:', this.customerForm.value);
+  }
+
+  private validateAllFormFields(): void {
+    Object.keys(this.customerForm.controls).forEach(field => {
+      const control = this.customerForm.get(field);
+      if (control) {
+        control.markAsTouched({ onlySelf: true });
+      }
+    });
+  }
+
+  // Helper methods for template
+  isFieldInvalid(field: string): boolean {
+    const control = this.customerForm.get(field);
+    return control ? control.invalid && control.touched : false;
+  }
+
+  getErrorMessage(field: string): string {
+    const control = this.customerForm.get(field);
+    if (!control || !control.errors) return '';
+
+    if (control.errors['required']) {
+      return 'This field is required';
+    }
+    if (control.errors['email']) {
+      return 'Please enter a valid email address';
+    }
+    if (control.errors['pattern']) {
+      return 'Please enter a valid 10-digit phone number';
+    }
+    if (control.errors['minlength']) {
+      return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
+    }
+    if (control.errors['emailDuplicate']) {
+      return 'This email is already registered';
+    }
+    if (control.errors['phoneDuplicate']) {
+      return 'This phone number is already registered';
+    }
+    return '';
   }
 }

@@ -9,68 +9,121 @@
     <!-- Cycle Details Card -->
     <div *ngIf="cycle" class="card detail-card">
       <div class="card-header">
-        <button class="btn btn-back" (click)="backToList()">
-          <i class="fa fa-arrow-left"></i> Back to Inventory
-        </button>
-        <h3 class="text-center">{{ cycle.modelName }}</h3>
+        <div class="d-flex justify-content-between align-items-center">
+          <button class="btn btn-back" (click)="backToList()">
+            <i class="fa fa-arrow-left me-2"></i> Back to Inventory
+          </button>
+          <div class="stock-status" [ngClass]="{
+            'low-stock': cycle.stockQuantity <= 5,
+            'out-of-stock': cycle.stockQuantity === 0
+          }">
+            <i class="fa" [ngClass]="{
+              'fa-exclamation-circle': cycle.stockQuantity <= 5,
+              'fa-times-circle': cycle.stockQuantity === 0
+            }"></i>
+            {{ cycle.stockQuantity === 0 ? 'Out of Stock' : 
+               cycle.stockQuantity <= 5 ? 'Low Stock' : 'In Stock' }}
+          </div>
+        </div>
+        <h2 class="text-center mt-3">{{ cycle.modelName }}</h2>
       </div>
   
       <div class="card-body">
-        <div class="row">
+        <div class="row g-4">
           <!-- Cycle Image Column -->
           <div class="col-lg-6">
             <div class="cycle-image-container">
-              <img [src]="'assets/cycle1.jpg'" 
+              <img [src]="cycle.imageUrl || 'assets/cycle1.jpg'" 
                    [alt]="cycle.modelName"
                    class="img-fluid cycle-image">
+              <div class="image-overlay">
+                <button class="btn btn-light" (click)="zoomImage()">
+                  <i class="fa fa-search-plus"></i>
+                </button>
+              </div>
             </div>
           </div>
   
           <!-- Details Column -->
           <div class="col-lg-6">
             <div class="details-section">
-              <h4 class="section-title">Specifications</h4>
-              
-              <div class="detail-row">
-                <span class="detail-label">Brand:</span>
-                <span class="detail-value">{{ cycle.brand.brandName }}</span>
-              </div>
-              
-              <div class="detail-row">
-                <span class="detail-label">Type:</span>
-                <span class="detail-value">{{ cycle.type.typeName }}</span>
-              </div>
-              
-              <div class="detail-row">
-                <span class="detail-label">Price:</span>
-                <span class="detail-value price">{{ cycle.price | currency:'USD':'symbol':'1.2-2' }}</span>
-              </div>
-              
-              <div class="detail-row">
-                <span class="detail-label">Stock:</span>
-                <span class="detail-value" 
-                      [ngClass]="{
+              <div class="specifications-card">
+                <h4 class="section-title">
+                  <i class="fa fa-info-circle me-2"></i>Specifications
+                </h4>
+                
+                <div class="specs-grid">
+                  <div class="spec-item">
+                    <div class="spec-icon">
+                      <i class="fa fa-tag"></i>
+                    </div>
+                    <div class="spec-content">
+                      <span class="spec-label">Brand</span>
+                      <span class="spec-value">{{ cycle.brand.brandName }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="spec-item">
+                    <div class="spec-icon">
+                      <i class="fa fa-bicycle"></i>
+                    </div>
+                    <div class="spec-content">
+                      <span class="spec-label">Type</span>
+                      <span class="spec-value">{{ cycle.type.typeName }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="spec-item">
+                    <div class="spec-icon">
+                      <i class="fa fa-dollar-sign"></i>
+                    </div>
+                    <div class="spec-content">
+                      <span class="spec-label">Price</span>
+                      <span class="spec-value price">{{ cycle.price | currency:'USD':'symbol':'1.2-2' }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="spec-item">
+                    <div class="spec-icon">
+                      <i class="fa fa-box"></i>
+                    </div>
+                    <div class="spec-content">
+                      <span class="spec-label">Stock</span>
+                      <span class="spec-value" [ngClass]="{
                         'text-danger': cycle.stockQuantity <= 2,
-                        'text-warning': cycle.stockQuantity > 2 && cycle.stockQuantity <= 5
+                        'text-warning': cycle.stockQuantity > 2 && cycle.stockQuantity <= 5,
+                        'text-success': cycle.stockQuantity > 5
                       }">
-                  {{ cycle.stockQuantity }} available
-                </span>
+                        {{ cycle.stockQuantity }} available
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
   
               <!-- Description -->
-              <div *ngIf="cycle.description" class="description-section">
-                <h4 class="section-title">Description</h4>
+              <div *ngIf="cycle.description" class="description-card">
+                <h4 class="section-title">
+                  <i class="fa fa-align-left me-2"></i>Description
+                </h4>
                 <p class="description-text">{{ cycle.description }}</p>
               </div>
   
-              <!-- Payment Button -->
-              <!-- <div class="action-buttons">
-                <button class="btn btn-rent" 
-                        (click)="proceedToPayment()"
-                        [disabled]="cycle.stockQuantity <= 0">
-                  <i class="fa fa-shopping-cart me-2"></i> Rent Now
-                </button>
-              </div> -->
+              <!-- Action Buttons -->
+              <div class="action-section">
+                <div class="price-section">
+                  <span class="price-label">Price</span>
+                  <span class="price-value">{{ cycle.price | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="action-buttons">
+                  <button class="btn btn-primary" 
+                          (click)="proceedToPayment()"
+                          [disabled]="cycle.stockQuantity <= 0">
+                    <i class="fa fa-shopping-cart me-2"></i> 
+                    {{ cycle.stockQuantity <= 0 ? 'Out of Stock' : 'Add to Cart' }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

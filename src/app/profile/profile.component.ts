@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  templateUrl: './profile.component.html'
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
   user: any;
@@ -44,6 +45,25 @@ export class ProfileComponent implements OnInit {
     const confirmPassword = form.get('confirmPassword')?.value;
     return newPassword === confirmPassword ? null : { mismatch: true };
   }
+
+  getOrderColumns(): Order[][] {
+    if (this.orders.length <= 5) {
+      return [this.orders];
+    }
+
+    const columns: Order[][] = [];
+    const itemsPerColumn = 7;
+    const totalColumns = Math.ceil(this.orders.length / itemsPerColumn);
+
+    for (let i = 0; i < totalColumns; i++) {
+      const start = i * itemsPerColumn;
+      const end = start + itemsPerColumn;
+      columns.push(this.orders.slice(start, end));
+    }
+
+    return columns;
+  }
+
   ngOnInit(): void {
     this.user = this.authService.currentUserValue;
     console.log('Profile Component - User Object:', this.user);

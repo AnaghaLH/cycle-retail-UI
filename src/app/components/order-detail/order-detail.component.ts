@@ -4,6 +4,7 @@ import { OrderService } from '../../services/order.service';
 import { Order } from '../../models/order.model';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
+import { Customer } from 'src/app/models/customer.model';
 
 @Component({
   selector: 'app-order-detail',
@@ -12,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class OrderDetailComponent implements OnInit {
   order!: Order;
+  customer!: Customer;
   isLoading = true;
   statusHistory: any[] = [];
   currentUser:any;

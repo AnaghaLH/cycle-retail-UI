@@ -14,10 +14,11 @@ import { OrderService } from '../../services/order.service';
 })
 export class CustomersComponent implements OnInit {
   customers: Customer[] = [];
+  filteredCustomers: Customer[] = [];
   isLoading = true;
   searchQuery = '';
   currentPage = 1;
-  itemsPerPage = 10;
+  itemsPerPage = 6;
   totalItems = 0;
   returnUrl: string | null = null;
   cartItems: any[] = [];
@@ -58,15 +59,21 @@ export class CustomersComponent implements OnInit {
   }
 
   applyFilters(): void {
+    let filtered = [...this.customers];
+    
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
-      this.customers = this.customers.filter(customer =>
+      filtered = filtered.filter(customer =>
         customer.firstName.toLowerCase().includes(query) ||
         customer.lastName.toLowerCase().includes(query) ||
         customer.email?.toLowerCase().includes(query) ||
         customer.phone?.toLowerCase().includes(query)
       );
     }
+    
+    this.filteredCustomers = filtered;
+    this.totalItems = this.filteredCustomers.length;
+    this.currentPage = 1; // Reset to first page when filters change
   }
 
   deleteCustomer(id: number): void {
@@ -93,6 +100,11 @@ export class CustomersComponent implements OnInit {
       }
     });
   }
+  goToCustomerDetail(customerId: number): void {
+    if (!this.returnUrl) {
+      this.router.navigate(['/customers', customerId]);
+    }
+  }
   
   getPageNumbers(): number[] {
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
@@ -102,7 +114,7 @@ export class CustomersComponent implements OnInit {
     let endPage = Math.min(totalPages, startPage + 4);
     
     if (endPage - startPage < 4) {
-      endPage = Math.min(totalPages, startPage + 4);
+      startPage = Math.max(1, endPage - 4);
     }
     
     for (let i = startPage; i <= endPage; i++) {
@@ -114,7 +126,17 @@ export class CustomersComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.loadCustomers();
+  }
+
+  calculateItemRange(): string {
+    const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+    const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+    return `Showing ${startItem} to ${endItem} of ${this.totalItems} customers`;
+  }
+
+  get pagedCustomers(): Customer[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredCustomers.slice(start, start + this.itemsPerPage);
   }
 
   selectCustomer(customer: Customer): void {

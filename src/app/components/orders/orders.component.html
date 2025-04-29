@@ -1,94 +1,124 @@
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <i class="fa fa-shopping-cart me-2 "></i>
       <h5 class="mb-0">Orders Management</h5>
-      <div>
-        <button class="btn btn-primary btn-sm" routerLink="/orders/new">
-          <i class="fa fa-plus me-1"></i> Create New Order
-        </button>
-      </div>
     </div>
-    <div class="card-body">
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <select class="form-select form-select-sm" [(ngModel)]="statusFilter" (change)="loadOrders()">
-            <option value="">All Statuses</option>
-            <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <div class="input-group input-group-sm">
-            <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchQuery" 
-                   (keyup.enter)="loadOrders()">
-            <button class="btn btn-outline-secondary" type="button" (click)="loadOrders()">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Date</th>
-              <th class="text-end">Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let order of orders">
-              <td>{{ order.orderId }}</td>
-              <td>
-                <a [routerLink]="['/customers', order.customerId]">
-                  {{ order.customerName }}
-                </a>
-              </td>
-              <td>{{ order.orderDate | date:'mediumDate' }}</td>
-              <td class="text-end">{{ order.totalAmount | currency }}</td>
-              <td>
-                <select class="form-select form-select-sm" [(ngModel)]="order.status" 
-                        (change)="updateStatus(order.orderId, order.status)"
-                        [disabled]="order.status === 'Cancelled' || order.status === 'Delivered'">
-                  <option *ngFor="let status of orderStatuses" [value]="status" 
-                          [disabled]="!isStatusAvailable(order.status, status)">
-                    {{ status }}
-                  </option>
-                </select>
-              </td>
-              <td>
-                <div class="btn-group btn-group-sm">
-                  <a [routerLink]="['/orders', order.orderId]" class="btn btn-outline-primary">
-                    <i class="fa fa-eye"></i>
-                  </a>
-                  <button (click)="deleteOrder(order.orderId)" class="btn btn-outline-danger" 
-                          [disabled]="!authService.isAdmin()">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-  
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <div>Showing {{ orders.length }} orders</div>
-        <nav>
-          <ul class="pagination pagination-sm mb-0">
-            <li class="page-item" [class.disabled]="currentPage === 1">
-              <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
-            </li>
-            <li *ngFor="let page of getPageNumbers()" class="page-item" [class.active]="page === currentPage">
-              <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
-            </li>
-            <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= totalItems">
-              <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+    <div>
+      <button class="btn btn-primary" routerLink="/orders/new">
+        <i class="fa fa-plus me-2"></i>Create New Order
+      </button>
     </div>
   </div>
+
+  <div class="card-body">
+    <!-- Search and Filters Section -->
+    <div class="row mb-4 g-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0">
+            <i class="fa fa-search text-muted"></i>
+          </span>
+          <input type="text" 
+                 class="form-control border-start-0" 
+                 placeholder="Search orders..." 
+                 [(ngModel)]="searchQuery" 
+                 (keyup.enter)="applyFilters()">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="">All Statuses</option>
+          <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of pagedOrders">
+            <td>
+              <span class="order-id">#{{ order.orderId }}</span>
+            </td>
+            <td>
+              <a [routerLink]="['/customers', order.customerId]" class="customer-link">
+                {{ order.customerName }}
+              </a>
+            </td>
+            <td>
+              <span class="order-date">{{ order.orderDate | date:'mediumDate' }}</span>
+            </td>
+            <td class="text-end">
+              <span class="order-amount">{{ order.totalAmount | currency }}</span>
+            </td>
+            <td>
+              <select class="form-select status-select" 
+                      [(ngModel)]="order.status" 
+                      (change)="updateStatus(order.orderId, order.status)"
+                      [disabled]="order.status === 'Cancelled' || order.status === 'Delivered'">
+                <option *ngFor="let status of orderStatuses" 
+                        [value]="status" 
+                        [disabled]="!isStatusAvailable(order.status, status)">
+                  {{ status }}
+                </option>
+              </select>
+            </td>
+            <td>
+              <div class="btn-group">
+                <a [routerLink]="['/orders', order.orderId]" 
+                   class="btn btn-outline-primary" 
+                   title="View Details">
+                  <i class="fa fa-eye"></i>
+                </a>
+                <button (click)="deleteOrder(order.orderId)" 
+                        class="btn btn-outline-danger" 
+                        [disabled]="!authService.isAdmin()"
+                        title="Delete Order">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Section -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div class="text-muted">
+        {{calculateItemRange()}}
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)">
+              <i class="fa fa-chevron-left"></i>
+            </a>
+          </li>
+          <li *ngFor="let page of getPageNumbers()" 
+              class="page-item" 
+              [class.active]="page === currentPage">
+            <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= totalItems">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)">
+              <i class="fa fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

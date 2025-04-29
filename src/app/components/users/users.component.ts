@@ -20,6 +20,10 @@ export class UsersComponent implements OnInit {
   searchTerm = '';
   searchSubject = new Subject<string>();
   filteredUsers: User[] = [];
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalItems = 0;
+  Math = Math;
 
   constructor(
     private userService: UserService,
@@ -50,7 +54,7 @@ export class UsersComponent implements OnInit {
     this.userService.getAllUsers('').subscribe({ 
       next: (users) => {
         this.users = users;
-        this.filteredUsers = [...users];
+        this.applySearchFilter(this.searchTerm);
         this.isLoading = false;
       },
       error: () => {
@@ -74,6 +78,8 @@ export class UsersComponent implements OnInit {
       user.email?.toLowerCase().includes(term) ||
       user.role?.toLowerCase().includes(term)
     );
+    this.totalItems = this.filteredUsers.length;
+    this.currentPage = 1;
   }
 
   startEdit(user: any): void {
@@ -142,4 +148,39 @@ export class UsersComponent implements OnInit {
     });
   }
   
+  // Pagination methods
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  getPageNumbers(): number[] {
+    const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    const pages: number[] = [];
+    
+    // Show up to 5 pages around current page
+    let startPage = Math.max(1, this.currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    
+    // Adjust if we're at the beginning
+    if (endPage - startPage < 4) {
+      endPage = Math.min(totalPages, startPage + 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  get pagedUsers(): User[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredUsers.slice(start, start + this.itemsPerPage);
+  }
+
+  calculateItemRange(): string {
+    const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+    const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+    return `Showing ${startItem} to ${endItem} of ${this.totalItems} users`;
+  }
 }

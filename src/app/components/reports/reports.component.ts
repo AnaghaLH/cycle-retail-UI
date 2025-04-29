@@ -5,6 +5,7 @@ import { CycleService } from '../../services/cycle.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
+import * as echarts from 'echarts';
 
 @Component({
   selector: 'app-reports',
@@ -105,20 +106,143 @@ export class ReportsComponent implements OnInit {
   }
 
   prepareCharts(): void {
+    // Sample data - replace with actual data from your backend
+    const orderStatusData = [
+      { value: 45, name: 'Completed' },
+      { value: 30, name: 'Processing' },
+      { value: 15, name: 'Pending' },
+      { value: 10, name: 'Cancelled' }
+    ];
+
+    const categoryRevenueData = [
+      { value: 12000, name: 'Mountain Cycle' },
+      { value: 8000, name: 'Road Cycle' },
+      { value: 6000, name: 'Hybrid Cycle' },
+      { value: 4000, name: 'Electric Cycle' }
+    ];
+
     this.chartOptions = {
       salesChart: {
         title: {
-          text: 'Sales Performance'
+          text: 'Sales Performance',
+          left: 'center',
+          textStyle: {
+            fontSize: 16,
+            fontWeight: 'normal'
+          }
         },
-        tooltip: {},
+        tooltip: {
+          trigger: 'axis',
+          formatter: (params: any) => {
+            const data = params[0];
+            return `${data.name}<br/>Sales: ${data.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
         xAxis: {
-          data: this.salesData.map(item => item.name)
+          type: 'category',
+          data: this.salesData.map(item => item.name),
+          axisLabel: {
+            rotate: 45
+          }
         },
-        yAxis: {},
+        yAxis: {
+          type: 'value',
+          axisLabel: {
+            formatter: (value: number) => {
+              return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+            }
+          }
+        },
         series: [{
           name: 'Sales',
           type: 'bar',
-          data: this.salesData.map(item => item.value)
+          data: this.salesData.map(item => item.value),
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#667eea' },
+              { offset: 1, color: '#764ba2' }
+            ])
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }]
+      },
+      orderStatusChart: {
+        title: {
+          
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [{
+          name: 'Order Status',
+          type: 'pie',
+          radius: '50%',
+          data: orderStatusData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }]
+      },
+      categoryChart: {
+        title: {
+          
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [{
+          name: 'Revenue',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '18',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: categoryRevenueData
         }]
       }
     };

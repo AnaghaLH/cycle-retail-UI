@@ -8,20 +8,22 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-control" formControlName="firstName">
-              <div *ngIf="customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched" 
-                   class="invalid-feedback d-block">
-                First name is required
+              <input type="text" class="form-control" 
+                     [ngClass]="{'is-invalid': isFieldInvalid('firstName')}"
+                     formControlName="firstName">
+              <div *ngIf="isFieldInvalid('firstName')" class="invalid-feedback">
+                {{ getErrorMessage('firstName') }}
               </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Last Name</label>
-              <input type="text" class="form-control" formControlName="lastName">
-              <div *ngIf="customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched" 
-                   class="invalid-feedback d-block">
-                Last name is required
+              <input type="text" class="form-control"
+                     [ngClass]="{'is-invalid': isFieldInvalid('lastName')}"
+                     formControlName="lastName">
+              <div *ngIf="isFieldInvalid('lastName')" class="invalid-feedback">
+                {{ getErrorMessage('lastName') }}
               </div>
             </div>
           </div>
@@ -31,24 +33,35 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Email</label>
-              <input type="email" class="form-control" formControlName="email">
-              <div *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched" 
-                   class="invalid-feedback d-block">
-                Please enter a valid email
+              <input type="email" class="form-control"
+                     [ngClass]="{'is-invalid': isFieldInvalid('email')}"
+                     formControlName="email">
+              <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+                {{ getErrorMessage('email') }}
               </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Phone</label>
-              <input type="tel" class="form-control" formControlName="phone">
+              <input type="tel" class="form-control"
+                     [ngClass]="{'is-invalid': isFieldInvalid('phone')}"
+                     formControlName="phone">
+              <div *ngIf="isFieldInvalid('phone')" class="invalid-feedback">
+                {{ getErrorMessage('phone') }}
+              </div>
             </div>
           </div>
         </div>
   
         <div class="mb-3">
           <label class="form-label">Address</label>
-          <textarea class="form-control" formControlName="address" rows="3"></textarea>
+          <textarea class="form-control"
+                    [ngClass]="{'is-invalid': isFieldInvalid('address')}"
+                    formControlName="address" rows="3"></textarea>
+          <div *ngIf="isFieldInvalid('address')" class="invalid-feedback">
+            {{ getErrorMessage('address') }}
+          </div>
         </div>
       </div>
       <div class="card-footer text-end">

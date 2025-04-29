@@ -47,9 +47,16 @@ export class CycleDetailComponent implements OnInit {
 
   proceedToPayment(): void {
     if (this.cycle) {
-      this.router.navigate(['/customers/payment'], {
+      this.router.navigate(['/cycle-shop'], {
         queryParams: { cycleId: this.cycle.cycleId }
       });
     }
+  }
+
+  zoomImage(): void {
+    // Create a modal or lightbox to show the zoomed image
+    // This is a placeholder for the zoom functionality
+    // You can implement a proper image zoom modal here
+    console.log('Zoom image clicked');
   }
 }

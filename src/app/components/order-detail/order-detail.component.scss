@@ -1,4 +1,31 @@
 /* Order Detail Component */
+.card {
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+
+   .card-header {
+    background: linear-gradient(135deg, #99a2cc 0%, #667eea 100%);
+    border: none;
+    padding: 1.25rem;
+    color: black;
+    //color: #667eea;
+
+    h5 {
+      font-weight: 0.8rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
 .order-detail-container {
     .card {
       border: none;
@@ -115,6 +142,7 @@
   
   .status-history {
     .list-group-item {
+      
       padding: 0.75rem 1.25rem;
       border-left: none;
       border-right: none;

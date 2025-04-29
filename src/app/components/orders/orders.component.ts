@@ -4,7 +4,7 @@ import { Order } from '../../models/order.model';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.component.html',
@@ -12,12 +12,13 @@ import { Router } from '@angular/router';
 })
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
+  filteredOrders: Order[] = [];
   isLoading = true;
   statusFilter = '';
   searchQuery = '';
   orderStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
   currentPage = 1;
-  itemsPerPage = 10;
+  itemsPerPage = 6;
   totalItems = 0;
 
   constructor(
@@ -36,11 +37,8 @@ export class OrdersComponent implements OnInit {
     this.orderService.getOrders().subscribe({
       next: (orders) => {
         this.orders = orders;
-        console.log(this.orders);
         this.applyFilters();
         this.isLoading = false;
-        
-
       },
       error: (error) => {
         this.toastr.error('Failed to load orders');
@@ -59,14 +57,14 @@ export class OrdersComponent implements OnInit {
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(order => 
-        // order.customer?.firstName.toLowerCase().includes(query) ||
-        // order.customer?.lastName.toLowerCase().includes(query) ||
         order.customerName.toLowerCase().includes(query) ||
         order.orderId.toString().includes(query)
       );
     }
     
-    this.orders = filtered;
+    this.filteredOrders = filtered;
+    this.totalItems = this.filteredOrders.length;
+    this.currentPage = 1; // Reset to first page when filters change
   }
 
   isStatusAvailable(currentStatus: string, targetStatus: string): boolean {
@@ -93,18 +91,30 @@ export class OrdersComponent implements OnInit {
   }
 
   deleteOrder(orderId: number): void {
-    if (!confirm('Are you sure you want to delete this order?')) return;
-
-    this.orderService.deleteOrder(orderId).subscribe({
-      next: () => {
-        this.toastr.success('Order deleted successfully');
-        this.loadOrders();
-      },
-      error: () => {
-        this.toastr.error('Failed to delete order');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.orderService.deleteOrder(orderId).subscribe({
+          next: () => {
+            this.toastr.success('Order deleted successfully');
+            this.loadOrders();
+          },
+          error: () => {
+            this.toastr.error('Failed to delete order');
+          }
+        });
       }
     });
   }
+  
 
   getPageNumbers(): number[] {
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
@@ -114,7 +124,7 @@ export class OrdersComponent implements OnInit {
     let endPage = Math.min(totalPages, startPage + 4);
     
     if (endPage - startPage < 4) {
-      endPage = Math.min(totalPages, startPage + 4);
+      startPage = Math.max(1, endPage - 4);
     }
     
     for (let i = startPage; i <= endPage; i++) {
@@ -126,6 +136,16 @@ export class OrdersComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.loadOrders();
+  }
+
+  calculateItemRange(): string {
+    const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+    const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+    return `Showing ${startItem} to ${endItem} of ${this.totalItems} orders`;
+  }
+
+  get pagedOrders(): Order[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredOrders.slice(start, start + this.itemsPerPage);
   }
 }

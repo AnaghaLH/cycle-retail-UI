@@ -96,51 +96,168 @@ export class PaymentFormComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
-    if (this.paymentForm.valid) {
-      this.isLoading = true;
+  // onSubmit(): void {
+  //   if (this.paymentForm.valid) {
+  //     this.isLoading = true;
       
-      const paymentData = {
-        orderId: this.paymentForm.value.orderId,
-        amount: this.totalAmount,
-        paymentMethod: this.paymentForm.value.paymentMethod,
-        transactionId: this.paymentForm.value.transactionId || '',
-        status: this.paymentForm.value.status,
-        customerName: this.paymentForm.value.customerName,
-        customerEmail: this.paymentForm.value.customerEmail,
-        customerPhone: this.paymentForm.value.customerPhone,
-        shippingAddress: this.paymentForm.value.shippingAddress,
-        paymentDate: new Date().toISOString()
-      };
+  //     const paymentData = {
+  //       orderId: this.paymentForm.value.orderId,
+  //       amount: this.totalAmount,
+  //       paymentMethod: this.paymentForm.value.paymentMethod,
+  //       transactionId: this.paymentForm.value.transactionId || '',
+  //       status: this.paymentForm.value.status,
+  //       customerName: this.paymentForm.value.customerName,
+  //       customerEmail: this.paymentForm.value.customerEmail,
+  //       customerPhone: this.paymentForm.value.customerPhone,
+  //       shippingAddress: this.paymentForm.value.shippingAddress,
+  //       paymentDate: new Date().toISOString()
+  //     };
 
-      this.paymentService.createPayment(paymentData).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Payment Successful!',
-            text: 'Your order has been placed successfully.',
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            // Clear cart and redirect to order confirmation
-            this.cartService.clearCart();
-            this.router.navigate(['/orders', this.paymentForm.value.orderId]);
-          });
-        },
-        error: (error) => {
-          this.isLoading = false;
-          const errorMessage =
-            error?.error?.message ||
-            error?.message ||
-            'Payment failed. Please try again later.';
-          console.error('Payment error:', error);
-          this.toastr.error(errorMessage);
-        }
-      });
-    } else {
+  //     this.paymentService.createPayment(paymentData).subscribe({
+  //       next: (response) => {
+  //         this.isLoading = false;
+  //         Swal.fire({
+  //           icon: 'success',
+  //           title: 'Payment Successful!',
+  //           text: 'Your order has been placed successfully.',
+  //           confirmButtonColor: '#3085d6'
+  //         }).then(() => {
+  //           // Clear cart and redirect to order confirmation
+  //           this.cartService.clearCart();
+  //           this.router.navigate(['/orders', this.paymentForm.value.orderId]);
+  //         });
+  //       },
+  //       error: (error) => {
+  //         this.isLoading = false;
+  //         const errorMessage =
+  //           error?.error?.message ||
+  //           error?.message ||
+  //           'Payment failed. Please try again later.';
+  //         console.error('Payment error:', error);
+  //         this.toastr.error(errorMessage);
+  //       }
+  //     });
+  //   } else {
+  //     this.markFormGroupTouched(this.paymentForm);
+  //   }
+  // }
+  onSubmit(): void {
+    if (this.paymentForm.invalid) {
       this.markFormGroupTouched(this.paymentForm);
+      return;
+    }
+  
+    const paymentMethod = this.paymentForm.value.paymentMethod;
+  
+    if (paymentMethod === 'Card') {
+      this.simulateCardPayment();
+    } else if (paymentMethod === 'UPI') {
+      this.showUpiQrAndSimulate();
+    } else if (paymentMethod === 'Cash') {
+      this.simulateCashPayment();
     }
   }
+  
+  // --- Helper methods ---
+  
+  private simulateCardPayment(): void {
+    this.isLoading = true;
+  
+    setTimeout(() => {
+      this.isLoading = false;
+      const isSuccess = Math.random() > 0.3; // 70% success
+  
+      if (isSuccess) {
+        this.showPaymentSuccessAndSave();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Payment Failed!',
+          text: 'Something went wrong during card payment. Please try again.',
+          confirmButtonColor: '#d33'
+        });
+      }
+    }, 2000); // 2 seconds fake delay
+  }
+  
+  private showUpiQrAndSimulate(): void {
+    Swal.fire({
+      title: 'Scan QR to Pay',
+      text: 'Use any UPI app to complete the payment',
+      imageUrl: 'assets/qr.png', // Replace with your own QR later
+      imageWidth: 250,
+      imageHeight: 250,
+      showCancelButton: true,
+      confirmButtonText: 'Payment Done',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.showPaymentSuccessAndSave();
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Payment Cancelled',
+          text: 'UPI Payment was not completed.',
+          confirmButtonColor: '#3085d6'
+        });
+      }
+    });
+  }
+  
+  private simulateCashPayment(): void {
+    Swal.fire({
+      icon: 'success',
+      title: 'Order Placed!',
+      text: 'Cash on Delivery selected. Please pay on delivery.',
+      confirmButtonColor: '#3085d6'
+    }).then(() => {
+      this.savePayment('Success');
+    });
+  }
+  
+  private showPaymentSuccessAndSave(): void {
+    Swal.fire({
+      icon: 'success',
+      title: 'Payment Successful!',
+      text: 'Your payment has been processed successfully.',
+      confirmButtonColor: '#3085d6'
+    }).then(() => {
+      this.savePayment('Success');
+    });
+  }
+  
+  private savePayment(status: string): void {
+    const paymentData = {
+      orderId: this.paymentForm.value.orderId,
+      amount: this.totalAmount,
+      paymentMethod: this.paymentForm.value.paymentMethod,
+      transactionId: 'TXN' + Math.floor(Math.random() * 1000000),
+      status: status,
+      customerName: this.paymentForm.value.customerName,
+      customerEmail: this.paymentForm.value.customerEmail,
+      customerPhone: this.paymentForm.value.customerPhone,
+      shippingAddress: this.paymentForm.value.shippingAddress,
+      paymentDate: new Date().toISOString()
+    };
+  
+    this.isLoading = true;
+    this.paymentService.createPayment(paymentData).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.toastr.success('Payment recorded successfully');
+        this.cartService.clearCart();
+        this.router.navigate(['/orders', this.paymentForm.value.orderId]);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error saving payment:', error);
+        this.toastr.error('Failed to record payment.');
+      }
+    });
+  }
+  
   
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {

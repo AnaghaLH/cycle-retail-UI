@@ -1,4 +1,45 @@
 // Customer Form Component
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+  height: auto;
+  margin-top: 150px;
+
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #667eea 100%);
+    border: none;
+    padding: 1rem 1.5rem;
+    color: black;
+    h5 {
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+
+      i {
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .card-footer {
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 1rem 1.5rem;
+  }
+}
 .customer-form {
     max-width: 600px;
     margin: 0 auto;
@@ -6,6 +47,8 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    width: 800px;
+    margin-left: 400px;
   
     // Form Header
     &__header {
@@ -126,6 +169,7 @@
       margin-top: 2rem;
       padding-top: 1.5rem;
       border-top: 1px solid #ecf0f1;
+      
   
       .btn {
         padding: 0.75rem 1.5rem;
@@ -135,12 +179,12 @@
         transition: all 0.2s ease;
   
         &--primary {
-          background-color: #3498db;
+          background-color: #667eea;
           color: white;
           border: none;
   
           &:hover {
-            background-color: darken(#3498db, 10%);
+            background-color: darken(#667eea, 10%);
           }
         }
   
