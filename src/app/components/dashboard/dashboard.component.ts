@@ -1,14 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { OrderService } from 'src/app/services/order.service';
 import { Order } from 'src/app/models/order.model';
 import { CycleService } from 'src/app/services/cycle.service';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { Observable } from 'rxjs';
+import { User } from 'src/app/models/user.model';
+
+// Register all Chart.js components
+Chart.register(...registerables);
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
+  @ViewChild('salesChart', { static: true }) salesChartRef!: ElementRef;
   recentOrders: Order[] = [];
   isLoading = false;
   errorMessage = '';
@@ -16,11 +24,17 @@ export class DashboardComponent implements OnInit {
   todaysOrders: number = 0;
   pendingOrders: number = 0;
   lowStock: number = 0;
+  private chart: Chart | null = null;
+  currentUser$: Observable<User | null>;
+  
+
   constructor(
     private orderService: OrderService,
     public authService: AuthService,
     private cycleService: CycleService
-  ) {}
+  ) {
+    this.currentUser$ = this.authService.currentUser;
+  }
 
   ngOnInit(): void {
     this.fetchRecentOrders();
@@ -28,6 +42,95 @@ export class DashboardComponent implements OnInit {
     this.fetchTodaysOrders();
     this.fetchPendingOrders();
     this.fetchLowStockCycles();
+  }
+
+  ngAfterViewInit(): void {
+    this.initChart();
+  }
+
+  private initChart(): void {
+    if (!this.salesChartRef) {
+      console.error('Chart canvas not found');
+      return;
+    }
+
+    const ctx = this.salesChartRef.nativeElement.getContext('2d');
+    if (!ctx) {
+      console.error('Could not get canvas context');
+      return;
+    }
+
+    // Destroy existing chart if it exists
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    const config: ChartConfiguration = {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+          label: 'Sales',
+          data: [12000, 19000, 15000, 25000, 22000, 30000, 28000, 35000, 32000, 40000, 38000, 45000],
+          fill: true,
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#667eea',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#667eea',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'rgba(0, 0, 0, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            displayColors: false,
+            callbacks: {
+              label: function(context) {
+                return `$${context.parsed.y.toLocaleString()}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    };
+
+    this.chart = new Chart(ctx, config);
   }
 
   fetchRecentOrders(): void {

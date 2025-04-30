@@ -181,14 +181,21 @@ timestamp = Date.now();
       return matchesSearch && matchesBrand && matchesType;
     }).sort((a, b) => {
       const field = this.sortField as keyof Cycle;
+      
+      // Handle numeric fields (price, stockQuantity)
+      if (field === 'price' || field === 'stockQuantity') {
+        const aVal = Number(a[field]) || 0;
+        const bVal = Number(b[field]) || 0;
+        return aVal - bVal;
+      }
+      
+      // Handle string fields (modelName)
       const aVal = a[field]?.toString().toLowerCase() ?? '';
       const bVal = b[field]?.toString().toLowerCase() ?? '';
       return aVal.localeCompare(bVal);
     });
   
     this.totalItems = this.filteredCycles.length;
-    // console.log('Filtered Cycles' + this.filteredCycles);
-    
     this.currentPage = 1;
   }
   

@@ -20,7 +20,7 @@ export class OrdersComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 6;
   totalItems = 0;
-
+  sortField= 'customerName';
   constructor(
     private orderService: OrderService,
     public authService: AuthService,
@@ -48,23 +48,48 @@ export class OrdersComponent implements OnInit {
   }
 
   applyFilters(): void {
-    let filtered = [...this.orders];
+    if (!this.orders) return;
     
-    if (this.statusFilter) {
-      filtered = filtered.filter(order => order.status === this.statusFilter);
-    }
+    const search = this.searchQuery.toLowerCase();
     
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(order => 
-        order.customerName.toLowerCase().includes(query) ||
-        order.orderId.toString().includes(query)
-      );
-    }
+    this.filteredOrders = this.orders.filter(order => {
+      // Search filter
+      const customerName = order.customerName?.toLowerCase() ?? '';
+      const orderId = order.orderId?.toString().toLowerCase() ?? '';
+      const matchesSearch = !this.searchQuery || 
+        customerName.includes(search) || 
+        orderId.includes(search);
+      
+      // Status filter
+      const matchesStatus = !this.statusFilter || 
+        order.status?.toLowerCase() === this.statusFilter.toLowerCase();
+      
+      return matchesSearch && matchesStatus;
+    }).sort((a, b) => {
+      const field = this.sortField as keyof Order;
+      
+      // Handle numeric fields
+      if (field === 'totalAmount' || field === 'orderId') {
+        const aVal = Number(a[field]) || 0;
+        const bVal = Number(b[field]) || 0;
+        return aVal - bVal;
+      }
+      
+      // Handle date fields
+      if (field === 'orderDate') {
+        const aDate = new Date(a[field] || '');
+        const bDate = new Date(b[field] || '');
+        return aDate.getTime() - bDate.getTime();
+      }
+      
+      // Handle string fields
+      const aVal = a[field]?.toString().toLowerCase() ?? '';
+      const bVal = b[field]?.toString().toLowerCase() ?? '';
+      return aVal.localeCompare(bVal);
+    });
     
-    this.filteredOrders = filtered;
     this.totalItems = this.filteredOrders.length;
-    this.currentPage = 1; // Reset to first page when filters change
+    this.currentPage = 1;
   }
 
   isStatusAvailable(currentStatus: string, targetStatus: string): boolean {

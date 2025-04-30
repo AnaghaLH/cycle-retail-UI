@@ -21,9 +21,9 @@
           </span>
           <input type="text" 
                  class="form-control border-start-0" 
-                 placeholder="Search orders..." 
+                 placeholder="Search order ID..." 
                  [(ngModel)]="searchQuery" 
-                 (keyup.enter)="applyFilters()">
+                 (ngModelChange)="applyFilters()">
         </div>
       </div>
       <div class="col-md-4">

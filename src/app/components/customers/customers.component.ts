@@ -22,6 +22,7 @@ export class CustomersComponent implements OnInit {
   totalItems = 0;
   returnUrl: string | null = null;
   cartItems: any[] = [];
+  sortField= 'firstName';
 
   constructor(
     private customerService: CustomerService,
@@ -58,23 +59,46 @@ export class CustomersComponent implements OnInit {
     });
   }
 
+  // applyFilters(): void {
+  //   let filtered = [...this.customers];
+    
+    
+  //   if (this.searchQuery) {
+  //     const query = this.searchQuery.toLowerCase();
+  //     filtered = filtered.filter(customer =>
+  //       customer.firstName.toLowerCase().includes(query) ||
+  //       customer.lastName.toLowerCase().includes(query) ||
+  //       customer.email?.toLowerCase().includes(query) ||
+  //       customer.phone?.toLowerCase().includes(query)
+  //     );
+  //   }
+    
+  //   this.filteredCustomers = filtered;
+  //   this.totalItems = this.filteredCustomers.length;
+  //   this.currentPage = 1; // Reset to first page when filters change
+  // }
+
   applyFilters(): void {
-    let filtered = [...this.customers];
-    
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(customer =>
-        customer.firstName.toLowerCase().includes(query) ||
-        customer.lastName.toLowerCase().includes(query) ||
-        customer.email?.toLowerCase().includes(query) ||
-        customer.phone?.toLowerCase().includes(query)
-      );
-    }
-    
-    this.filteredCustomers = filtered;
-    this.totalItems = this.filteredCustomers.length;
-    this.currentPage = 1; // Reset to first page when filters change
-  }
+  
+  if(!this.customers) return;
+  const search = this.searchQuery.toLowerCase();
+  this.filteredCustomers = this.customers.filter(customer =>
+    {
+      const firstName=customer.firstName.toLowerCase() ?? '';
+    const lastName=customer.lastName.toLowerCase() ?? '';
+    const matchesSearch = !this.searchQuery ||
+      firstName.includes(search) ||
+      lastName.includes(search) 
+    return matchesSearch;
+  }).sort((a, b) => {
+    const field = this.sortField as keyof Customer;
+    const aVal = a[field]?.toString().toLowerCase() ?? '';
+    const bVal = b[field]?.toString().toLowerCase() ?? '';
+    return aVal.localeCompare(bVal);
+  });
+  this.totalItems = this.filteredCustomers.length;
+  this.currentPage = 1; // Reset to first page when filters change
+}
 
   deleteCustomer(id: number): void {
     Swal.fire({

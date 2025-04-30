@@ -18,7 +18,7 @@
                  class="form-control border-start-0" 
                  placeholder="Search customers..." 
                  [(ngModel)]="searchQuery" 
-                 (keyup.enter)="applyFilters()">
+                 (ngModelChange)="applyFilters()">
         </div>
       </div>
     </div>
